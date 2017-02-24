@@ -1,8 +1,5 @@
 import numpy as np
 
-# wtype_list = ["random","local","global"]
-wtype_list = ["random"]
-
 class weakSSAC:
 	def __init__(self,X,k,q=1,wtype="random"):
 		self.X = X
@@ -13,14 +10,17 @@ class weakSSAC:
 		self.beta = 1
 		self.wtype = wtype
 		self.y = None
+		# self.wtype_list = ["random","local","global"]
+		self.wtype_list = ["random"]
 
 	def set_params(self,eta,beta):
 		self.eta = eta
 		self.beta = beta
 
 	def set_wtype(self,wtype):
-		assert wtype in wtype_list,\
-		        "Weakness type {} is not supported. Supported {}".format(wtype,wtype_list)
+		assert wtype in self.wtype_list,\
+		        "Weakness type {} is not supported. Supported {}".format(
+		        	             wtype,self.wtype_list)
 		self.wtype = wtype
 
 	def fit(self):
