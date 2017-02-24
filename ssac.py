@@ -55,8 +55,18 @@ class weakSSAC:
 
 	def clusterAssign(self,idx_Z):
 		y_Z = [0]*len(idx_Z)
+		k_max = 0
+		for idx in idx_Z:
+			y_Z[idx] = self.weakQuery()
 
 		return y_Z
+
+	def weakQuery(self,x,y):
+		if self.wtype == "random":
+			return 
+
+		else:
+			return 0
 
 	def binarySearch(idx_S_sorted,S,idx_p,p):
 
