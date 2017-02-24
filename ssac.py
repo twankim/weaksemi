@@ -28,6 +28,8 @@ class weakSSAC:
 		S = np.arange(self.n) # Initial set of indices
 		r = int(np.ceil(self.k*self.eta))
 
+		self.mpps = []
+
 		for i in xrange(self.k):
 			# Phase 1
 			if r >= len(S):
@@ -40,15 +42,18 @@ class weakSSAC:
 			p = np.argmax([y_Z.count(t) for t in xrange(1,self.k+1)])+1
 			idx_p = idx_Z[np.array(y_Z)==p]
 			mpp = np.mean(self.X[idx_p,:],axis=0)
+			print "Size of Z_p: {}".format(len(idx_p))
+
+			self.mpps.append(mpp)
 
 			# Phase 2
 			idx_S_sorted = np.argsort(np.linalg.norm(
-				                          self.X-np.tile(mpp,(self.n,1)),
+				                          self.X[S,:]-np.tile(mpp,(len(S),1)),
 				                          axis=1))
-			idx_r = self.binarySearch(idx_S_sorted,S,idx_p,p)
+			idx_r = self.binarySearch(idx_S_sorted,idx_p)
 
 			for i_assign in idx_S_sorted[:idx_r]:
-				y[i_assign] = i+1
+				y[S[i_assign]] = i+1
 			S = np.array(list(set(S)-set(idx_S_sorted[:idx_r])))
 
 		self.y = y
@@ -58,6 +63,7 @@ class weakSSAC:
 			return np.random.binomial(1,self.q)*\
 			       2*(int(self.y[idx_x]==self.y[idx_y])-0.5)
 		else:
+			print "Not sure!!!"
 			return 0
 
 	def clusterAssign(self,idx_Z):
@@ -80,7 +86,7 @@ class weakSSAC:
 				k_max += 1
 		return y_Z
 
-	def binarySearch(self,idx_S_sorted,S,idx_p,p):
+	def binarySearch(self,idx_S_sorted,idx_p):
 		idx_l = 0
 		idx_r = len(idx_S_sorted)
 		list_yes = list(idx_p)

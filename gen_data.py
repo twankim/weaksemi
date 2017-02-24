@@ -22,6 +22,6 @@ class genData:
 
 		y += 1
 
-		self.gamma = max(gammas)
+		self.gamma = min(gammas)
 
 		return X,y

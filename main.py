@@ -21,6 +21,7 @@ for q in qs:
 	algo.set_params(eta,beta)
 	algo.fit()
 	y_pred = algo.y
+	mpps = algo.mpps
 
 	gamma = dataset.gamma
 
@@ -32,5 +33,9 @@ for q in qs:
 	plt.subplot(122)
 	plt.scatter(X[:,0],X[:,1],c=y_pred)
 	plt.title("SSAC result ($\gamma$={:.2f})".format(gamma))
+
+	for t in xrange(k):
+		mpp = mpps[t]
+		plt.plot(mpp[0],mpp[1],'g^',ms=10)
 
 	plt.show()
