@@ -47,14 +47,14 @@ class weakSSAC:
 			self.mpps.append(mpp)
 
 			# Phase 2
-			idx_S_sorted = np.argsort(np.linalg.norm(
+			idx_S_sorted = S[np.argsort(np.linalg.norm(
 				                          self.X[S,:]-np.tile(mpp,(len(S),1)),
-				                          axis=1))
-			idx_r = self.binarySearch(idx_S_sorted,idx_p)
+				                          axis=1))]
+			idx_radius = self.binarySearch(idx_S_sorted,idx_p)
 
-			for i_assign in idx_S_sorted[:idx_r]:
-				y[S[i_assign]] = i+1
-			S = np.array(list(set(S)-set(idx_S_sorted[:idx_r])))
+			for i_assign in idx_S_sorted[:idx_radius]:
+				y[i_assign] = i+1
+			S = np.array(list(set(S)-set(idx_S_sorted[:idx_radius])))
 
 		self.y = y
 
@@ -88,28 +88,30 @@ class weakSSAC:
 
 	def binarySearch(self,idx_S_sorted,idx_p):
 		idx_l = 0
-		idx_r = len(idx_S_sorted)
+		idx_r = len(idx_S_sorted)-1
 		list_yes = list(idx_p)
 
-		while idx_l < idx_r:
+		while idx_l <= idx_r:
 			idx_j = int(np.floor((idx_l+idx_r)*0.5))
-			answer = self.weakQuery(idx_S_sorted[0],idx_j)
+			answer = self.weakQuery(idx_S_sorted[0],idx_S_sorted[idx_j])
 			if answer == 1:
 				idx_l = idx_j+1
-				list_yes.append(idx_j)
+				list_yes.append(idx_S_sorted[idx_j])
 			elif answer == -1:
 				idx_r = idx_j-1
 			else:
 				set_idx_B = np.random.randint(0,len(idx_p),self.beta-1)
-				answers = [self.weakQuery(idx_B,idx_j) for idx_B in set_idx_B]
+				answers = [self.weakQuery(idx_p[idx_B],
+					                      idx_S_sorted[idx_j]) for idx_B in set_idx_B]
 				if 1 in answers:
 					idx_l = idx_j+1
-					list_yes.append(idx_j)
+					list_yes.append(idx_S_sorted[idx_j])
 				else:
 					idx_r = idx_j-1
 
-		if idx_l in list_yes:
-			return idx_l+1
-		else:
-			return idx_l
+		# if idx_S_sorted[idx_l] in list_yes:
+		# 	return idx_l+1
+		# else:
+		# 	if weakQuery(idx_[])
+		# 	return idx_l
 		return idx_l
