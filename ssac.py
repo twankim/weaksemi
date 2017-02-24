@@ -1,15 +1,15 @@
 import numpy as np
 
 class weakSSAC:
-	def __init__(self,X,k,q=1,wtype="random"):
+	def __init__(self,X,y,k,q=1,wtype="random"):
 		self.X = X
 		self.n, self.m = np.shape(X)
+		self.y = y
 		self.k = k
 		self.q = q
 		self.eta = np.log2(self.n)
 		self.beta = 1
 		self.wtype = wtype
-		self.y = None
 		# self.wtype_list = ["random","local","global"]
 		self.wtype_list = ["random"]
 
@@ -28,7 +28,7 @@ class weakSSAC:
 		S = np.arange(self.n) # Initial set of indices
 		r = int(np.ceil(self.k*self.eta))
 
-		for i in xrange(k):
+		for i in xrange(self.k):
 			# Phase 1
 			if r >= len(S):
 				r = len(S)
@@ -47,31 +47,36 @@ class weakSSAC:
 				                          axis=1))
 			idx_r = self.binarySearch(idx_S_sorted,S,idx_p,p)
 
-			y[idx_S_sorted[:idx_r]] = i+1
-			S = np.array(set(S)-set(idx_S_sorted[:idx_r]))
+			for i_assign in idx_S_sorted[:idx_r]:
+				y[i_assign] = i+1
+			S = np.array(list(set(S)-set(idx_S_sorted[:idx_r])))
 
 		self.y = y
 
 	def weakQuery(self,idx_x,idx_y):
 		if self.wtype == "random":
 			return np.random.binomial(1,self.q)*\
-			       int(2*((self.y[idx_x]==self.y[idx_y])-0.5))
+			       2*(int(self.y[idx_x]==self.y[idx_y])-0.5)
 		else:
 			return 0
 
 	def clusterAssign(self,idx_Z):
 		y_Z = [0]*len(idx_Z)
 		k_max = 0
-		for idx in idx_Z:
+		for i,idx in enumerate(idx_Z):
 			set_idx = [y_Z.index(k) for k in xrange(1,k_max+1)]
-			answers = [self.weakQuery(idx,idx_set) for idx_set in set_idx]
+			if len(set_idx)>0:
+				answers = [self.weakQuery(idx,idx_set) for idx_set in set_idx]
+			else:
+				answers = []
+
 			if len(answers) == 0:
-				y_Z[idx] = k_max+1
+				y_Z[i] = k_max+1
 				k_max += 1
 			elif 1 in answers:
-				y_Z[idx] = y_Z[set_idx[answers.index(1)]]
+				y_Z[i] = y_Z[set_idx[answers.index(1)]]
 			elif sum(answers) == -k_max:
-				y_Z[idx] = k_max+1
+				y_Z[i] = k_max+1
 				k_max += 1
 		return y_Z
 
@@ -81,14 +86,13 @@ class weakSSAC:
 		list_yes = list(idx_p)
 
 		while idx_l < idx_r:
-			idx_j = np.floor(idx_l+idx_r)
+			idx_j = int(np.floor((idx_l+idx_r)*0.5))
 			answer = self.weakQuery(idx_S_sorted[0],idx_j)
 			if answer == 1:
 				idx_l = idx_j+1
 				list_yes.append(idx_j)
-			else answer == -1:
+			elif answer == -1:
 				idx_r = idx_j-1
-				list_no.append(idx_j)
 			else:
 				set_idx_B = np.random.randint(0,len(idx_p),self.beta-1)
 				answers = [self.weakQuery(idx_B,idx_j) for idx_B in set_idx_B]
