@@ -10,7 +10,7 @@ class weakSSAC:
 		self.eta = np.log2(self.n)
 		self.beta = 1
 		self.wtype = wtype
-		# self.wtype_list = ["random","local","global"]
+		# self.wtype_list = ["random","local-distance","global-distance"]
 		self.wtype_list = ["random"]
 
 	def set_params(self,eta,beta):
