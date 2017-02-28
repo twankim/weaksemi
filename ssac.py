@@ -42,7 +42,7 @@ class weakSSAC:
 			p = np.argmax([y_Z.count(t) for t in xrange(1,self.k+1)])+1
 			idx_p = idx_Z[np.array(y_Z)==p]
 			mpp = np.mean(self.X[idx_p,:],axis=0)
-			print "Size of Z_p: {}".format(len(idx_p))
+			# print "Size of Z_p: {}".format(len(idx_p))
 
 			self.mpps.append(mpp)
 
@@ -91,6 +91,7 @@ class weakSSAC:
 		idx_r = len(idx_S_sorted)-1
 		list_yes = list(idx_p)
 
+		bs_num = 0
 		while idx_l <= idx_r:
 			idx_j = int(np.floor((idx_l+idx_r)*0.5))
 			answer = self.weakQuery(idx_S_sorted[0],idx_S_sorted[idx_j])
@@ -108,6 +109,9 @@ class weakSSAC:
 					list_yes.append(idx_S_sorted[idx_j])
 				else:
 					idx_r = idx_j-1
+			bs_num += 1
+
+		self.bs_num = bs_num
 
 		# if idx_S_sorted[idx_l] in list_yes:
 		# 	return idx_l+1
