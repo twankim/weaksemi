@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-02 13:31:04
+# @Last Modified time: 2017-05-04 11:26:06
 
 import numpy as np
 import time
@@ -23,9 +23,14 @@ def main(args):
 	etas = [float(eta) for eta in args.etas.split(',')]
 	beta = args.beta
 
-	print "... Generating Data"
-	dataset = genData(n,m,k,1)
+	# Generate Synthetic data
+	# m dimensional, n points, k cluster
+	# min_gamma: minimum gamma margin
+	print "... Generating data"
+	dataset = genData(n,m,k,args.min_gamma,1)
 	X,y_true = dataset.gen()
+	print "... Synthetic data is generated: gamma={}, (n,m,k)=({},{},{})".format(
+		                                            dataset.gamma,n,m,k)
 
 	for q in qs:
 		for eta in etas:
@@ -81,6 +86,9 @@ def parse_args():
     parser.add_argument('-beta', dest='beta',
                         help='beta: parameter for sampling (phase 2)',
                         default = 10, type = int)
+    parser.add_argument('-gamma', dest='min_gamma',
+                        help='minimum gamma margin (default:1)',
+                        default = 1, type = int)
     parser.add_argument('-isplot', dest='isplot',
                         help='plot the result',
                         default = True, type = str2bool)
