@@ -30,7 +30,7 @@ class genData:
 		self.delta = delta
 		assert (q >0) and (q<=1), "q must be in (0,1]"
 		if q < 1:
-			return int(np.ceil(np.log(2*self.k*(self.m+1)/delta) / \
+			return int(np.ceil(np.log(2.0*self.k*(self.m+1)/delta) / \
 		                       np.log(1.0/(1 - q**(self.k-1)*(1-np.exp(-(self.gamma-1)**2 /8.0))))
 		                       ))
 		else:
