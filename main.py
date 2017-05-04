@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-04 11:26:06
+# @Last Modified time: 2017-05-04 14:21:25
 
 import numpy as np
 import time
@@ -33,8 +33,9 @@ def main(args):
 		                                            dataset.gamma,n,m,k)
 
 	for q in qs:
+		print "\n- Proper eta={}, beta={} (delta={})".format(dataset.calc_eta(q),dataset.calc_beta(q),dataset.delta)
 		for eta in etas:
-			print "<Test: n={}, m={}, q={}, eta={}, beta={}>".format(n,m,q,eta,beta)
+			print "<Test: q={}, eta={}, beta={}>".format(q,eta,beta)
 			algo = weakSSAC(X,y_true,k,q)
 			algo.set_params(eta,beta)
 			algo.fit()

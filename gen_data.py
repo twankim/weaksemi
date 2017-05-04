@@ -25,3 +25,21 @@ class genData:
 			self.gamma = min(gammas)
 
 		return X,y
+
+	def calc_eta(self,q,delta=0.99):
+		self.delta = delta
+		assert (q >0) and (q<=1), "q must be in (0,1]"
+		if q < 1:
+			return int(np.ceil(np.log(2*self.k*(self.m+1)/delta) / \
+		                       np.log(1.0/(1 - q**(self.k-1)*(1-np.exp(-(self.gamma-1)**2 /8.0))))
+		                       ))
+		else:
+			return int(np.ceil( 8*np.log(2*self.k*(self.m+1)/delta) / (self.gamma-1)**2 ))
+	
+	def calc_beta(self,q,delta=0.99):
+	    self.delta = delta
+	    assert (q >0) and (q<=1), "q must be in (0,1]"
+	    if q < 1:
+	    	return int(np.ceil(np.log(2*self.k*np.log(self.n)/delta) / np.log(1.0/(1-q))))
+	    else:
+	    	return 1
