@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-04 14:21:25
+# @Last Modified time: 2017-05-05 00:16:18
 
 import numpy as np
 import time
@@ -14,6 +14,7 @@ from ssac import weakSSAC
 from gen_data import genData
 
 weak = "randaom"
+delta = 0.99
 
 def main(args):
 	k = args.k
@@ -29,36 +30,47 @@ def main(args):
 	print "... Generating data"
 	dataset = genData(n,m,k,args.min_gamma,1)
 	X,y_true = dataset.gen()
-	print "... Synthetic data is generated: gamma={}, (n,m,k)=({},{},{})".format(
-		                                            dataset.gamma,n,m,k)
+	print "... Synthetic data is generated: gamma={}, (n,m,k)=({},{},{})".format(dataset.gamma,n,m,k)
 
+	# Test SSAC algorithm for different q's and eta's (fix beta in this case)
 	for q in qs:
-		print "\n- Proper eta={}, beta={} (delta={})".format(dataset.calc_eta(q),dataset.calc_beta(q),dataset.delta)
+		# Calculate proper eta and beta based on parameters including delta
+		print "\n- Proper eta={}, beta={} (delta={})".format(
+			    dataset.calc_eta(q,delta),dataset.calc_beta(q,delta),delta)
+
+		algo = weakSSAC(X,y_true,k,q)
 		for eta in etas:
-			print "<Test: q={}, eta={}, beta={}>".format(q,eta,beta)
-			algo = weakSSAC(X,y_true,k,q)
+			print "  <Test: q={}, eta={}, beta={}>".format(q,eta,beta)
+			
+			# algo = weakSSAC(X,y_true,k,q)
 			algo.set_params(eta,beta)
 			algo.fit()
+			
 			y_pred = algo.y
-			mpps = algo.mpps
-			print "... Clustering is done. Binary Search number = {}".format(algo.bs_num)
+			mpps = algo.mpps # Estimated cluster centers
+			
+			print "  ... Clustering is done. Binary Search number = {}".format(algo.bs_num)
 	
 			gamma = dataset.gamma
-	
-			plt.figure(figsize=(14,7))
-			plt.suptitle(r"SSAC with {} weak oracle ($q={},\eta={}, \beta={}$)".format(weak,q,eta,beta))
-	
-			plt.subplot(121)
-			plt.scatter(X[:,0],X[:,1],c=y_true)
-			plt.title("True dataset ($\gamma$={:.2f})".format(gamma))
-	
-			plt.subplot(122)
-			plt.scatter(X[:,0],X[:,1],c=y_pred)
-			plt.title("SSAC result ($\gamma$={:.2f})".format(gamma))
-	
-			for t in xrange(k):
-				mpp = mpps[t]
-				plt.plot(mpp[0],mpp[1],'g^',ms=10)
+
+			if args.isplot:
+				plt.figure(figsize=(14,7))
+			    plt.suptitle(r"SSAC with {} weak oracle ($q={},\eta={}, \beta={}$)".format(weak,q,eta,beta))
+
+			    # Plot original clustering (k-means)
+			    plt.subplot(121)
+			    plt.scatter(X[:,0],X[:,1],c=y_true)
+			    plt.title("True dataset ($\gamma$={:.2f})".format(gamma))
+
+			    # Plot SSAC result
+			    plt.subplot(122)
+			    plt.scatter(X[:,0],X[:,1],c=y_pred)
+			    plt.title("SSAC result ($\gamma$={:.2f})".format(gamma))
+
+			    # Plot estimated cluster centers
+			    for t in xrange(k):
+			    	mpp = mpps[t]
+			    	plt.plot(mpp[0],mpp[1],'g^',ms=10)
 	
 	if args.isplot:
 		plt.show()

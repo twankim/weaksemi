@@ -26,8 +26,7 @@ class genData:
 
 		return X,y
 
-	def calc_eta(self,q,delta=0.99):
-		self.delta = delta
+	def calc_eta(self,q,delta):
 		assert (q >0) and (q<=1), "q must be in (0,1]"
 		if q < 1:
 			return int(np.ceil(np.log(2.0*self.k*(self.m+1)/delta) / \
@@ -36,8 +35,7 @@ class genData:
 		else:
 			return int(np.ceil( 8*np.log(2*self.k*(self.m+1)/delta) / (self.gamma-1)**2 ))
 	
-	def calc_beta(self,q,delta=0.99):
-	    self.delta = delta
+	def calc_beta(self,q,delta):
 	    assert (q >0) and (q<=1), "q must be in (0,1]"
 	    if q < 1:
 	    	return int(np.ceil(np.log(2*self.k*np.log(self.n)/delta) / np.log(1.0/(1-q))))
