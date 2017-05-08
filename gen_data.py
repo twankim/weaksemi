@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+# @Author: twankim
+# @Date:   2017-05-05 00:06:53
+# @Last Modified by:   twankim
+# @Last Modified time: 2017-05-05 20:20:03
+
 import numpy as np
 from sklearn.datasets import make_blobs
 

@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-05 00:16:18
+# @Last Modified time: 2017-05-06 23:39:35
 
 import numpy as np
 import time
@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 
 from ssac import weakSSAC
 from gen_data import genData
+from utils import *
 
 weak = "randaom"
 delta = 0.99
@@ -55,22 +56,22 @@ def main(args):
 
 			if args.isplot:
 				plt.figure(figsize=(14,7))
-			    plt.suptitle(r"SSAC with {} weak oracle ($q={},\eta={}, \beta={}$)".format(weak,q,eta,beta))
+				plt.suptitle(r"SSAC with {} weak oracle ($q={},\eta={}, \beta={}$)".format(weak,q,eta,beta))
 
-			    # Plot original clustering (k-means)
-			    plt.subplot(121)
-			    plt.scatter(X[:,0],X[:,1],c=y_true)
-			    plt.title("True dataset ($\gamma$={:.2f})".format(gamma))
+				# Plot original clustering (k-means)
+				plt.subplot(121)
+				plt.scatter(X[:,0],X[:,1],c=y_true)
+				plt.title("True dataset ($\gamma$={:.2f})".format(gamma))
 
-			    # Plot SSAC result
-			    plt.subplot(122)
-			    plt.scatter(X[:,0],X[:,1],c=y_pred)
-			    plt.title("SSAC result ($\gamma$={:.2f})".format(gamma))
+				# Plot SSAC result
+				plt.subplot(122)
+				plt.scatter(X[:,0],X[:,1],c=y_pred)
+				plt.title("SSAC result ($\gamma$={:.2f})".format(gamma))
 
-			    # Plot estimated cluster centers
-			    for t in xrange(k):
-			    	mpp = mpps[t]
-			    	plt.plot(mpp[0],mpp[1],'g^',ms=10)
+				# Plot estimated cluster centers
+				for t in xrange(k):
+					mpp = mpps[t]
+					plt.plot(mpp[0],mpp[1],'g^',ms=10)
 	
 	if args.isplot:
 		plt.show()

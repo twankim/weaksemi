@@ -1,10 +1,17 @@
+# -*- coding: utf-8 -*-
+# @Author: twankim
+# @Date:   2017-05-05 20:19:24
+# @Last Modified by:   twankim
+# @Last Modified time: 2017-05-08 12:09:32
+
 import numpy as np
 
 class weakSSAC:
-	def __init__(self,X,y,k,q=1,wtype="random"):
+	def __init__(self,X,y_true,k,q=1,wtype="random"):
 		self.X = X
 		self.n, self.m = np.shape(X)
-		self.y = y
+		self.y_true = y_true
+		self.y = [0]*self.n
 		self.k = k
 		self.q = q
 		self.eta = np.log2(self.n)
@@ -24,68 +31,89 @@ class weakSSAC:
 		self.wtype = wtype
 
 	def fit(self):
-		y = [0]*self.n
+		self.y = [0]*self.n # Initialize cluster assignments as 0
 		S = np.arange(self.n) # Initial set of indices
-		r = int(np.ceil(self.k*self.eta))
-
-		self.mpps = []
+		r = int(np.ceil(self.k*self.eta)) # Sample size for phase 1
+		self.mpps = [] # Estimated cluster centers
+		self.clusters=[] # Assigned clusters
 
 		for i in xrange(self.k):
-			# Phase 1
+			# --------------- Phase 1 ---------------
+			# 1) Sample points for cluster center estimation
 			if r >= len(S):
 				r = len(S)
 				print "Warning: sample size > remaining points"
 			idx_Z = S[np.random.randint(0,len(S),r)]
 
+			# 2) Cluster Assignment Query
 			y_Z = self.clusterAssign(idx_Z)
 
-			p = np.argmax([y_Z.count(t) for t in xrange(1,self.k+1)])+1
+			# Find a cluster with maximum number of samples
+			p = self.clusters[np.argmax([y_Z.count(t) for t in self.clusters])]
 			idx_p = idx_Z[np.array(y_Z)==p]
 			mpp = np.mean(self.X[idx_p,:],axis=0)
 			# print "Size of Z_p: {}".format(len(idx_p))
 
-			self.mpps.append(mpp)
+			self.mpps.append(mpp) # Estimated cluster center
 
-			# Phase 2
+			# --------------- Phase 2 ---------------
+			# 1) Sort points in S based on distances from the cluster center.
 			idx_S_sorted = S[np.argsort(np.linalg.norm(
 				                          self.X[S,:]-np.tile(mpp,(len(S),1)),
 				                          axis=1))]
+			# 2) Apply binary serach algorithm
 			idx_radius = self.binarySearch(idx_S_sorted,idx_p)
 
+			# 3) Assign clusters based on the radius.
 			for i_assign in idx_S_sorted[:idx_radius]:
-				y[i_assign] = i+1
+				self.y[i_assign] = p
+
+			# 4) Exclude assigned points
 			S = np.array(list(set(S)-set(idx_S_sorted[:idx_radius])))
 
-		self.y = y
-
+    # Weak Same Cluster Query
 	def weakQuery(self,idx_x,idx_y):
+		# 1: same cluster
+		# 0: not-sure
+		# -1: different cluster
 		if self.wtype == "random":
 			return np.random.binomial(1,self.q)*\
-			       2*(int(self.y[idx_x]==self.y[idx_y])-0.5)
+			       2*(int(self.y_true[idx_x]==self.y_true[idx_y])-0.5)
 		else:
 			print "Not sure!!!"
 			return 0
 
+    # Weak Cluster Assignment Query
 	def clusterAssign(self,idx_Z):
 		y_Z = [0]*len(idx_Z)
-		k_max = 0
 		for i,idx in enumerate(idx_Z):
-			set_idx = [y_Z.index(k) for k in xrange(1,k_max+1)]
-			if len(set_idx)>0:
-				answers = [self.weakQuery(idx,idx_set) for idx_set in set_idx]
-			else:
+			if len(self.clusters)==0:
+				# Currently, none of points are assigned
 				answers = []
-
-			if len(answers) == 0:
-				y_Z[i] = k_max+1
-				k_max += 1
-			elif 1 in answers:
-				y_Z[i] = y_Z[set_idx[answers.index(1)]]
-			elif sum(answers) == -k_max:
-				y_Z[i] = k_max+1
-				k_max += 1
+				# Assign initial point 
+				y_Z[i] = 1
+				self.clusters.append(1)
+			else:
+				# Find anchor points from each cluster (Use assignment-known points)
+			    # -> Use for cluster assignment queries
+				set_idx = [self.y.index(k) for k in self.clusters]
+				# Ask same-cluster queries
+				answers = [self.weakQuery(idx,idx_set) for idx_set in set_idx]
+				if 1 in answers:
+					y_Z[i] = self.y[set_idx[answers.index(1)]]
+					if y_Z[i] == 0:
+						print "Something Wrong!!!!!!!!! (Assigned index has cluster 0)"
+				elif sum(answers) == -len(self.clusters):
+					if len(self.clusters) < self.k:
+						self.clusters.append(len(self.clusters)+1)
+						y_Z[i] = len(self.clusters)
+					# If all k same-cluster queries are not-sure
+					# -> Assign as cluster 0 (Fail in cluster assignment query)
+			# Update cluster assignment
+			self.y[idx] = y_Z[i]
 		return y_Z
 
+	# Binary Search Algorithm for SSAC
 	def binarySearch(self,idx_S_sorted,idx_p):
 		idx_l = 0
 		idx_r = len(idx_S_sorted)-1
