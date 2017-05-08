@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:19:24
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-08 12:09:32
+# @Last Modified time: 2017-05-08 15:39:50
 
 import numpy as np
 
@@ -115,35 +115,34 @@ class weakSSAC:
 
 	# Binary Search Algorithm for SSAC
 	def binarySearch(self,idx_S_sorted,idx_p):
-		idx_l = 0
-		idx_r = len(idx_S_sorted)-1
-		list_yes = list(idx_p)
+		idx_l = 0 # left index
+		idx_r = len(idx_S_sorted)-1 # right index
 
-		bs_num = 0
+		bs_num = 0 # Number of binary search comparison
 		while idx_l <= idx_r:
 			idx_j = int(np.floor((idx_l+idx_r)*0.5))
+			
+			# Use the closest point as an anchor point for same-cluster query
 			answer = self.weakQuery(idx_S_sorted[0],idx_S_sorted[idx_j])
-			if answer == 1:
+			if answer == 1: # Same cluster
 				idx_l = idx_j+1
-				list_yes.append(idx_S_sorted[idx_j])
-			elif answer == -1:
+			elif answer == -1: # Different cluster
 				idx_r = idx_j-1
-			else:
+			else: # Not sure
+			    # Sample beta-1 additional points
 				set_idx_B = np.random.randint(0,len(idx_p),self.beta-1)
 				answers = [self.weakQuery(idx_p[idx_B],
 					                      idx_S_sorted[idx_j]) for idx_B in set_idx_B]
 				if 1 in answers:
 					idx_l = idx_j+1
-					list_yes.append(idx_S_sorted[idx_j])
+				elif -1 in answers:
+					idx_r = idx_j-1
 				else:
+					# Can return fail, but regard it as not in the same cluster
+					# Follows the unified-weak BinarySearch model.
+					print "Not-sure in binary search (Fail) -> Regard it as different cluster"
 					idx_r = idx_j-1
 			bs_num += 1
 
 		self.bs_num = bs_num
-
-		# if idx_S_sorted[idx_l] in list_yes:
-		# 	return idx_l+1
-		# else:
-		# 	if weakQuery(idx_[])
-		# 	return idx_l
 		return idx_l
