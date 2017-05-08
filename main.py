@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-06 23:39:35
+# @Last Modified time: 2017-05-08 16:03:52
 
 import numpy as np
 import time
@@ -18,6 +18,7 @@ weak = "randaom"
 delta = 0.99
 
 def main(args):
+	rep = args.rep
 	k = args.k
 	n = args.n
 	m = args.m
@@ -25,63 +26,64 @@ def main(args):
 	etas = [float(eta) for eta in args.etas.split(',')]
 	beta = args.beta
 
-	# Generate Synthetic data
-	# m dimensional, n points, k cluster
-	# min_gamma: minimum gamma margin
-	print "... Generating data"
-	dataset = genData(n,m,k,args.min_gamma,1)
-	X,y_true = dataset.gen()
-	print "... Synthetic data is generated: gamma={}, (n,m,k)=({},{},{})".format(dataset.gamma,n,m,k)
-
-	# Test SSAC algorithm for different q's and eta's (fix beta in this case)
-	for q in qs:
-		# Calculate proper eta and beta based on parameters including delta
-		print "\n- Proper eta={}, beta={} (delta={})".format(
-			    dataset.calc_eta(q,delta),dataset.calc_beta(q,delta),delta)
-
-		algo = weakSSAC(X,y_true,k,q)
-		for eta in etas:
-			print "  <Test: q={}, eta={}, beta={}>".format(q,eta,beta)
-			
-			# algo = weakSSAC(X,y_true,k,q)
-			algo.set_params(eta,beta)
-			algo.fit()
-			
-			y_pred = algo.y
-			mpps = algo.mpps # Estimated cluster centers
-			
-			print "  ... Clustering is done. Binary Search number = {}".format(algo.bs_num)
+	for i_rep in xrange(rep):
+		# Generate Synthetic data
+		# m dimensional, n points, k cluster
+		# min_gamma: minimum gamma margin
+		print "({}/{})... Generating data".format(i_rep+1,rep)
+		dataset = genData(n,m,k,args.min_gamma,1)
+		X,y_true = dataset.gen()
+		print "({}/{})... Synthetic data is generated: gamma={}, (n,m,k)=({},{},{})".format(
+			    i_rep+1,rep,dataset.gamma,n,m,k)
 	
-			gamma = dataset.gamma
-
-			if args.isplot:
-				plt.figure(figsize=(14,7))
-				plt.suptitle(r"SSAC with {} weak oracle ($q={},\eta={}, \beta={}$)".format(weak,q,eta,beta))
-
-				# Plot original clustering (k-means)
-				plt.subplot(121)
-				plt.scatter(X[:,0],X[:,1],c=y_true)
-				plt.title("True dataset ($\gamma$={:.2f})".format(gamma))
-
-				# Plot SSAC result
-				plt.subplot(122)
-				plt.scatter(X[:,0],X[:,1],c=y_pred)
-				plt.title("SSAC result ($\gamma$={:.2f})".format(gamma))
-
-				# Plot estimated cluster centers
-				for t in xrange(k):
-					mpp = mpps[t]
-					plt.plot(mpp[0],mpp[1],'g^',ms=10)
+		# Test SSAC algorithm for different q's and eta's (fix beta in this case)
+		for q in qs:
+			# Calculate proper eta and beta based on parameters including delta
+			print "   - Proper eta={}, beta={} (delta={})".format(
+				        dataset.calc_eta(q,delta),dataset.calc_beta(q,delta),delta)
 	
-	if args.isplot:
-		plt.show()
-
+			algo = weakSSAC(X,y_true,k,q)
+			for eta in etas:
+				print "     <Test: q={}, eta={}, beta={}>".format(q,eta,beta)
+				algo.set_params(eta,beta)
+				algo.fit()
+				
+				y_pred = algo.y
+				mpps = algo.mpps # Estimated cluster centers
+				gamma = dataset.gamma
+				print "     ... Clustering is done. Binary Search number = {}\n".format(algo.bs_num)
+	
+				if args.isplot:
+					plt.figure(figsize=(14,7))
+					plt.suptitle(r"SSAC with {} weak oracle ($q={},\eta={}, \beta={}$)".format(weak,q,eta,beta))
+	
+					# Plot original clustering (k-means)
+					plt.subplot(121)
+					plt.scatter(X[:,0],X[:,1],c=y_true)
+					plt.title("True dataset ($\gamma$={:.2f})".format(gamma))
+	
+					# Plot SSAC result
+					plt.subplot(122)
+					plt.scatter(X[:,0],X[:,1],c=y_pred)
+					plt.title("SSAC result ($\gamma$={:.2f})".format(gamma))
+	
+					# Plot estimated cluster centers
+					for t in xrange(k):
+						mpp = mpps[t]
+						plt.plot(mpp[0],mpp[1],'g^',ms=10)
+		
+		if args.isplot:
+			plt.show()
+	
 def parse_args():
     def str2bool(v):
         return v.lower() in ('true', '1')
 
     parser = argparse.ArgumentParser(description=
                         'Test Semi-Supervised Active Clustering with Weak Oracles: Random-weak model')
+    parser.add_argument('-rep', dest='rep',
+                        help='Number of experiments to repeat',
+                        default = 1, type = int)
     parser.add_argument('-k', dest='k',
                         help='Number of clusters in synthetic data',
                         default = 3, type = int)

@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:19:24
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-08 15:39:50
+# @Last Modified time: 2017-05-08 15:54:21
 
 import numpy as np
 
@@ -140,7 +140,7 @@ class weakSSAC:
 				else:
 					# Can return fail, but regard it as not in the same cluster
 					# Follows the unified-weak BinarySearch model.
-					print "Not-sure in binary search (Fail) -> Regard it as different cluster"
+					print "Not-sure in binary search (Fail) -> Regard as different clusters"
 					idx_r = idx_j-1
 			bs_num += 1
 
