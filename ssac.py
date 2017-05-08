@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:19:24
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-08 15:54:21
+# @Last Modified time: 2017-05-08 18:01:36
 
 import numpy as np
 
@@ -35,7 +35,8 @@ class weakSSAC:
 		S = np.arange(self.n) # Initial set of indices
 		r = int(np.ceil(self.k*self.eta)) # Sample size for phase 1
 		self.mpps = [] # Estimated cluster centers
-		self.clusters=[] # Assigned clusters
+		self.labels = [] # Cluster labels which are recovered (correspond to mpps)
+		self.clusters=[] # Cluster labels which are known
 
 		for i in xrange(self.k):
 			# --------------- Phase 1 ---------------
@@ -67,9 +68,15 @@ class weakSSAC:
 			# 3) Assign clusters based on the radius.
 			for i_assign in idx_S_sorted[:idx_radius]:
 				self.y[i_assign] = p
+			self.labels.append(p)
 
 			# 4) Exclude assigned points
 			S = np.array(list(set(S)-set(idx_S_sorted[:idx_radius])))
+
+        # Some Failure cases
+		if len(self.labels) < self.k: # Number of recovered clusters are less than k
+			print "!!!! Number of assigned clusters={} is less than k={}. /(Excluding cluster 0)"\
+			      .format(len(self.labels), self.k)
 
     # Weak Same Cluster Query
 	def weakQuery(self,idx_x,idx_y):

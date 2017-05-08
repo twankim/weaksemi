@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 00:06:53
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-05 20:20:03
+# @Last Modified time: 2017-05-08 17:40:19
 
 import numpy as np
 from sklearn.datasets import make_blobs
@@ -13,7 +13,7 @@ class genData:
 		self.m = m
 		self.k = k
 		self.std = std
-		self.min_gamma = 1
+		self.min_gamma = min_gamma
 		self.gamma = 0
 
 	def gen(self):
@@ -30,6 +30,8 @@ class genData:
 			y += 1
 			self.gamma = min(gammas)
 
+		self.X = X
+		self.y = y
 		return X,y
 
 	def calc_eta(self,q,delta):
