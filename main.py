@@ -2,11 +2,12 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-08 17:38:25
+# @Last Modified time: 2017-05-08 22:29:33
 
 import numpy as np
 import time
 import sys
+import os
 import argparse
 import matplotlib.pyplot as plt
 
@@ -16,7 +17,8 @@ from utils import *
 
 weak = "randaom"
 delta = 0.99
-std = 2
+std = 1.5
+res_dir='./results'
 
 def main(args):
 	rep = args.rep
@@ -31,6 +33,9 @@ def main(args):
 	res_acc = np.zeros((rep,len(qs),len(etas))) # Accuracy of clustering
 	res_mean_acc = np.zeros((rep,len(qs),len(etas))) # Mean accuracy of clustering (per cluster)
 
+	if not os.path.exists(res_dir):
+		os.makedirs(res_dir)
+
 	for i_rep in xrange(rep):
 		# Generate Synthetic data
 		# m dimensional, n points, k cluster
@@ -39,8 +44,8 @@ def main(args):
 		dataset = genData(n,m,k,args.min_gamma,std)
 		X,y_true = dataset.gen()
 		gamma = dataset.gamma
-		print "({}/{})... Synthetic data is generated: gamma={}, (n,m,k)=({},{},{})".format(
-			    i_rep+1,rep,gamma,n,m,k)
+		print "({}/{})... Synthetic data is generated: gamma={}, (n,m,k,std)=({},{},{},{})".format(
+			    i_rep+1,rep,gamma,n,m,k,std)
 	
 		# Test SSAC algorithm for different q's and eta's (fix beta in this case)
 		for i_q,q in enumerate(qs):
@@ -61,11 +66,12 @@ def main(args):
 				# For evaluation & plotting, find best permutation of cluster assignment
 				y_pred_perm = find_permutation(dataset,algo)
 
+				# Calculate accuracy and mean accuracy
 				res_acc[i_rep,i_q,i_eta] = accuracy(y_true,y_pred_perm)
 				res_mean_acc[i_rep,i_q,i_eta] = mean_accuracy(y_true,y_pred_perm)
 	
 				if args.isplot and (i_rep == i_plot):
-					plt.figure(i_q*len(etas)+i_eta+1, figsize=(14,7))
+					f = plt.figure(figsize=(14,7))
 					plt.suptitle(r"SSAC with {} weak oracle ($q={},\eta={}, \beta={}$)".format(weak,q,eta,beta))
 	
 					# Plot original clustering (k-means)
@@ -82,12 +88,18 @@ def main(args):
 					for t in xrange(k):
 						mpp = mpps[t]
 						plt.plot(mpp[0],mpp[1],'w^',ms=15)
-		
-	plt.figure()
-	plt.title(r"Accuracy of SSAC (# of experiments={})".format(rep))
-	plt.plot()
+
+					f.savefig(res_dir+'/fig_n{}_m{}_k{}_q{}_e{}.pdf'.format(n,m,k,q,eta),bbox_inches='tight')
+					plt.close()
+
+	# Write result as table
 
 	if args.isplot:
+		# Plot Accuracy vs. eta
+		plot_eval("Accuracy",res_acc,qs,etas)
+		# Plot Mean Accuracy vs. eta
+		plot_eval("Mean Accuracy",res_acc,qs,etas)
+
 		plt.show()
 	
 def parse_args():
@@ -104,7 +116,7 @@ def parse_args():
                         default = 3, type = int)
     parser.add_argument('-n', dest='n',
                         help='Number of data points in synthetic data',
-                        default = 10000, type = int)
+                        default = 5000, type = int)
     parser.add_argument('-m', dest='m',
                         help='Dimension of data points in synthetic data',
                         default = 2, type = int)
@@ -113,7 +125,7 @@ def parse_args():
                         default = '0.7,0.85,1', type = str)
     parser.add_argument('-etas', dest='etas',
                         help='etas: parameter for sampling (phase 1) ex) 10,50',
-                        default = '10,50', type = str)
+                        default = '5,10,50', type = str)
     parser.add_argument('-beta', dest='beta',
                         help='beta: parameter for sampling (phase 2)',
                         default = 10, type = int)
