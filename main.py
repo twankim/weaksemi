@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-09 15:04:40
+# @Last Modified time: 2017-05-09 18:30:28
 
 import numpy as np
 import time
@@ -87,6 +87,8 @@ def main(args):
 				res_mean_err[i_rep,i_q,i_eta] = mean_numerror(y_true,y_pred_perm)
 	
 				if args.isplot and (i_rep == i_plot) and (m<=2):
+					classes = range(k+1)
+					cmap = plt.cm.get_cmap("brg",k+1)
 					if verbose:
 					    print " ... Plotting"
 					f = plt.figure(figsize=(14,7))
@@ -94,13 +96,22 @@ def main(args):
 	
 					# Plot original clustering (k-means)
 					plt.subplot(121)
-					plt.scatter(X[:,0],X[:,1],c=y_true)
+					for i in xrange(1,k+1):
+						idx = y_true==i
+						plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i])
+					# plt.scatter(X[:,0],X[:,1],c=y_true,label=classes)
 					plt.title("True dataset ($\gamma$={:.2f})".format(gamma))
+					plt.legend()
 	
 					# Plot SSAC result
 					plt.subplot(122)
-					plt.scatter(X[:,0],X[:,1],c=y_pred_perm)
+					for i in xrange(0,k+1):
+						idx = np.array(y_pred_perm)==i
+						if sum(idx)>0:
+						    plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i])
+					# plt.scatter(X[:,0],X[:,1],c=y_pred_perm,label=classes)
 					plt.title("SSAC result ($\gamma$={:.2f})".format(gamma))
+					plt.legend()
 	
 					# Plot estimated cluster centers
 					for t in xrange(k):
