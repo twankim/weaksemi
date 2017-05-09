@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-09 00:21:17
+# @Last Modified time: 2017-05-09 15:05:12
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -58,13 +58,12 @@ def find_permutation(dataset,algo):
 def plot_eval(eval_metric,res,qs,etas,fig_name):
 	rep = res.shape[0]
 	f = plt.figure()
-	plt.title(r"{} of SSAC (# of experiments={})\n".format(eval_metric,rep))
+	plt.title(r"{} of SSAC (Averaged over {} experiments)".format(eval_metric,rep))
 	for i_q,q in enumerate(qs):
 		plt.plot(etas,res.mean(axis=0)[i_q,:],'x-',label=r'$q={}$'.format(q))
-	plt.xlabel(r"$\eta$")
+	plt.xlabel(r"$\eta (Number of samples per cluster)$")
 	plt.ylabel(eval_metric)
 	if "accuracy" in eval_metric.lower():
-		plt.ylim([0,1])
 		plt.legend(loc=4)
 	elif "error" in eval_metric.lower():
 		plt.legend(loc=1)
@@ -73,3 +72,13 @@ def plot_eval(eval_metric,res,qs,etas,fig_name):
 	plt.xlim([0,np.round(1.2*max(etas))])
 	
 	f.savefig(fig_name,bbox_inches='tight')
+
+def plot_hist(gammas,min_gamma,max_gamma):
+	rep = len(gammas)
+	f = plt.figure()
+	plt.hist(gammas,normed=True,bins=5)
+	plt.title(r"Histogram of $\gamma$. min={}, max={} ({} generation)".format(min_gamma,max_gamma,rep))
+	plt.xlabel(r"$\gamma")
+	plt.ylabel("Probability")
+
+	f.savefig("fig_gamma_hist.pdf",bbox_inches='tight')

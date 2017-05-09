@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-09 00:29:00
+# @Last Modified time: 2017-05-09 15:04:40
 
 import numpy as np
 import time
@@ -18,7 +18,7 @@ from utils import *
 weak = "randaom"
 delta = 0.99
 std = 1.5
-res_dir='./results'
+base_dir='./results'
 
 def main(args):
 	rep = args.rep
@@ -35,7 +35,12 @@ def main(args):
 	res_mean_acc = np.zeros((rep,len(qs),len(etas))) # Mean accuracy of clustering (per cluster)
 	res_err = np.zeros((rep,len(qs),len(etas))) # Accuracy of clustering
 	res_mean_err = np.zeros((rep,len(qs),len(etas))) # Mean accuracy of clustering (per cluster)
+	gammas = np.zeros(rep)
 
+	# Make directories to save results
+	if not os.path.exists(base_dir):
+		os.makedirs(base_dir)
+	res_dir = base_dir + '/{}_{}'.format(args.min_gamma,args.max_gamma)
 	if not os.path.exists(res_dir):
 		os.makedirs(res_dir)
 
@@ -45,9 +50,10 @@ def main(args):
 		# min_gamma: minimum gamma margin
 		if verbose:
 		    print "({}/{})... Generating data".format(i_rep+1,rep)
-		dataset = genData(n,m,k,args.min_gamma,std)
+		dataset = genData(n,m,k,args.min_gamma,args.max_gamma,std)
 		X,y_true = dataset.gen()
 		gamma = dataset.gamma
+		gammas[i_rep] = gamma
 		print "({}/{})... Synthetic data is generated: gamma={}, (n,m,k,std)=({},{},{},{})".format(
 			    i_rep+1,rep,gamma,n,m,k,std)
 
@@ -105,23 +111,26 @@ def main(args):
 					plt.close()
 
 	# Write result as table
+	# !!!!!!!!!!Need to be implemented
 
-	if args.isplot:
-		# Plot Accuracy vs. eta
-		fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("acc",n,m,k)
-		plot_eval("Accuracy",res_acc,qs,etas,fig_name)
-		# Plot Mean Accuracy vs. eta
-		fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("meanacc",n,m,k)
-		plot_eval("Mean Accuracy",res_mean_acc,qs,etas,fig_name)
+	# Plot Accuracy vs. eta
+	fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("acc",n,m,k)
+	plot_eval("Accuracy",res_acc,qs,etas,fig_name)
+	# Plot Mean Accuracy vs. eta
+	fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("meanacc",n,m,k)
+	plot_eval("Mean Accuracy",res_mean_acc,qs,etas,fig_name)
 
-		# Plot Accuracy vs. eta
-		fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("numerr",n,m,k)
-		plot_eval("# Error",res_err,qs,etas,fig_name)
-		# Plot Mean Accuracy vs. eta
-		fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("meannumerr",n,m,k)
-		plot_eval("Mean # Error",res_mean_err,qs,etas,fig_name)
+	# Plot Accuracy vs. eta
+	fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("numerr",n,m,k)
+	plot_eval("# Error",res_err,qs,etas,fig_name)
+	# Plot Mean Accuracy vs. eta
+	# fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("meannumerr",n,m,k)
+	# plot_eval("Mean # Error",np.log10(res_mean_err),qs,etas,fig_name)
 
-		plt.show()
+	# Plot histogram of gammas
+	plot_hist(gammas,args.min_gamma,args.max_gamma)
+
+	plt.show()
 	
 def parse_args():
     def str2bool(v):
@@ -131,7 +140,7 @@ def parse_args():
                         'Test Semi-Supervised Active Clustering with Weak Oracles: Random-weak model')
     parser.add_argument('-rep', dest='rep',
                         help='Number of experiments to repeat',
-                        default = 1, type = int)
+                        default = 50, type = int)
     parser.add_argument('-k', dest='k',
                         help='Number of clusters in synthetic data',
                         default = 3, type = int)
@@ -146,13 +155,16 @@ def parse_args():
                         default = '0.7,0.85,1', type = str)
     parser.add_argument('-etas', dest='etas',
                         help='etas: parameter for sampling (phase 1) ex) 10,50',
-                        default = '2,5,10,50', type = str)
+                        default = '2,5,10,20,50', type = str)
     parser.add_argument('-beta', dest='beta',
                         help='beta: parameter for sampling (phase 2)',
                         default = 10, type = int)
-    parser.add_argument('-gamma', dest='min_gamma',
+    parser.add_argument('-g_min', dest='min_gamma',
                         help='minimum gamma margin (default:1)',
                         default = 1.0, type = float)
+    parser.add_argument('-g_max', dest='max_gamma',
+                        help='minimum gamma margin (default:1)',
+                        default = 1.25, type = float)
     parser.add_argument('-isplot', dest='isplot',
                         help='plot the result: True/False',
                         default = True, type = str2bool)

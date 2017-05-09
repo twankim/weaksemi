@@ -2,22 +2,23 @@
 # @Author: twankim
 # @Date:   2017-05-05 00:06:53
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-08 17:40:19
+# @Last Modified time: 2017-05-09 10:36:10
 
 import numpy as np
 from sklearn.datasets import make_blobs
 
 class genData:
-	def __init__(self,n,m,k,min_gamma=1, std=0.7):
+	def __init__(self,n,m,k,min_gamma=1,max_gamma=1.25,std=1.0):
 		self.n = n
 		self.m = m
 		self.k = k
 		self.std = std
 		self.min_gamma = min_gamma
+		self.max_gamma = max_gamma
 		self.gamma = 0
 
 	def gen(self):
-		while self.gamma <= self.min_gamma:
+		while (self.gamma <= self.min_gamma) or (self.gamma > self.max_gamma):
 			X,y = make_blobs(n_samples=self.n,n_features=self.m,centers=self.k,cluster_std = self.std)
 			X_means = [X[y==t,:].mean(axis=0) for t in xrange(self.k)]
 			gammas = []

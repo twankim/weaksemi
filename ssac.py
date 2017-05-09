@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:19:24
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-08 23:41:36
+# @Last Modified time: 2017-05-09 14:57:57
 
 import numpy as np
 
@@ -101,6 +101,8 @@ class weakSSAC:
 				# Assign initial point 
 				y_Z[i] = 1
 				self.clusters.append(1)
+				# Update cluster assignment
+				self.y[idx] = y_Z[i]
 			else:
 				# Find anchor points from each cluster (Use assignment-known points)
 			    # -> Use for cluster assignment queries
@@ -115,10 +117,10 @@ class weakSSAC:
 					if len(self.clusters) < self.k:
 						self.clusters.append(len(self.clusters)+1)
 						y_Z[i] = len(self.clusters)
-					# If all k same-cluster queries are not-sure
-					# -> Assign as cluster 0 (Fail in cluster assignment query)
-			# Update cluster assignment
-			self.y[idx] = y_Z[i]
+						# Update cluster assignment
+						self.y[idx] = y_Z[i]
+				# If all k same-cluster queries are not-sure
+				# -> Assign as cluster 0 (Fail in cluster assignment query)
 		return y_Z
 
 	# Binary Search Algorithm for SSAC
