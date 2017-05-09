@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-08 23:31:15
+# @Last Modified time: 2017-05-09 00:29:00
 
 import numpy as np
 import time
@@ -33,6 +33,8 @@ def main(args):
 	
 	res_acc = np.zeros((rep,len(qs),len(etas))) # Accuracy of clustering
 	res_mean_acc = np.zeros((rep,len(qs),len(etas))) # Mean accuracy of clustering (per cluster)
+	res_err = np.zeros((rep,len(qs),len(etas))) # Accuracy of clustering
+	res_mean_err = np.zeros((rep,len(qs),len(etas))) # Mean accuracy of clustering (per cluster)
 
 	if not os.path.exists(res_dir):
 		os.makedirs(res_dir)
@@ -48,7 +50,8 @@ def main(args):
 		gamma = dataset.gamma
 		print "({}/{})... Synthetic data is generated: gamma={}, (n,m,k,std)=({},{},{},{})".format(
 			    i_rep+1,rep,gamma,n,m,k,std)
-	
+
+		algo = weakSSAC(X,y_true,k,q)
 		# Test SSAC algorithm for different q's and eta's (fix beta in this case)
 		for i_q,q in enumerate(qs):
 			# Calculate proper eta and beta based on parameters including delta
@@ -56,11 +59,10 @@ def main(args):
 			    print "   - Proper eta={}, beta={} (delta={})".format(
 			 	        dataset.calc_eta(q,delta),dataset.calc_beta(q,delta),delta)
 	
-			algo = weakSSAC(X,y_true,k,q)
 			for i_eta,eta in enumerate(etas):
 				if verbose:
 				    print "     <Test: q={}, eta={}, beta={}>".format(q,eta,beta)
-				algo.set_params(eta,beta)
+				algo.set_params(q,eta,beta)
 				algo.fit()
 				
 				y_pred = algo.y
@@ -73,6 +75,10 @@ def main(args):
 				# Calculate accuracy and mean accuracy
 				res_acc[i_rep,i_q,i_eta] = accuracy(y_true,y_pred_perm)
 				res_mean_acc[i_rep,i_q,i_eta] = mean_accuracy(y_true,y_pred_perm)
+
+				# Calculate number of errors
+				res_err[i_rep,i_q,i_eta] = numerror(y_true,y_pred_perm)
+				res_mean_err[i_rep,i_q,i_eta] = mean_numerror(y_true,y_pred_perm)
 	
 				if args.isplot and (i_rep == i_plot) and (m<=2):
 					if verbose:
@@ -106,7 +112,14 @@ def main(args):
 		plot_eval("Accuracy",res_acc,qs,etas,fig_name)
 		# Plot Mean Accuracy vs. eta
 		fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("meanacc",n,m,k)
-		plot_eval("Mean Accuracy",res_acc,qs,etas,fig_name)
+		plot_eval("Mean Accuracy",res_mean_acc,qs,etas,fig_name)
+
+		# Plot Accuracy vs. eta
+		fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("numerr",n,m,k)
+		plot_eval("# Error",res_err,qs,etas,fig_name)
+		# Plot Mean Accuracy vs. eta
+		fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("meannumerr",n,m,k)
+		plot_eval("Mean # Error",res_mean_err,qs,etas,fig_name)
 
 		plt.show()
 	
@@ -133,13 +146,13 @@ def parse_args():
                         default = '0.7,0.85,1', type = str)
     parser.add_argument('-etas', dest='etas',
                         help='etas: parameter for sampling (phase 1) ex) 10,50',
-                        default = '5,10,50', type = str)
+                        default = '2,5,10,50', type = str)
     parser.add_argument('-beta', dest='beta',
                         help='beta: parameter for sampling (phase 2)',
                         default = 10, type = int)
     parser.add_argument('-gamma', dest='min_gamma',
                         help='minimum gamma margin (default:1)',
-                        default = 1, type = int)
+                        default = 1.0, type = float)
     parser.add_argument('-isplot', dest='isplot',
                         help='plot the result: True/False',
                         default = True, type = str2bool)

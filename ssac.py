@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:19:24
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-08 18:01:36
+# @Last Modified time: 2017-05-08 23:41:36
 
 import numpy as np
 
@@ -13,14 +13,15 @@ class weakSSAC:
 		self.y_true = y_true
 		self.y = [0]*self.n
 		self.k = k
-		self.q = q
+		self.q = 1
 		self.eta = np.log2(self.n)
 		self.beta = 1
 		self.wtype = wtype
 		self.wtype_list = ["random"]
 		# self.wtype_list = ["random","local-distance","global-distance"]
 
-	def set_params(self,eta,beta):
+	def set_params(self,q,eta,beta):
+		self.q = q
 		self.eta = eta
 		self.beta = beta
 

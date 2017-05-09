@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-08 23:18:29
+# @Last Modified time: 2017-05-09 00:21:17
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,6 +18,17 @@ def mean_accuracy(y_true,y_pred):
 	accuracy = [np.sum(hamming[y_true==label])/float(np.sum(y_true==label))\
 	            for label in labels]
 	return np.mean(accuracy)
+
+def numerror(y_true,y_pred):
+	return np.sum(y_true!=y_pred)
+
+def mean_numerror(y_true,y_pred):
+	labels = np.unique(y_true)
+	num_error = np.zeros(len(labels))
+	hamming = y_true!=y_pred
+
+	accuracy = [np.sum(hamming[y_true==label]) for label in labels]
+	return np.mean(num_error)
 
 # Find best matching permutation of y_pred clustering
 # Also need to change mpp of algorithm
@@ -47,12 +58,18 @@ def find_permutation(dataset,algo):
 def plot_eval(eval_metric,res,qs,etas,fig_name):
 	rep = res.shape[0]
 	f = plt.figure()
-	plt.title(r"{} of SSAC (# of experiments={})".format(eval_metric,rep))
+	plt.title(r"{} of SSAC (# of experiments={})\n".format(eval_metric,rep))
 	for i_q,q in enumerate(qs):
 		plt.plot(etas,res.mean(axis=0)[i_q,:],'x-',label=r'$q={}$'.format(q))
 	plt.xlabel(r"$\eta$")
 	plt.ylabel(eval_metric)
-	plt.ylim([0,1])
+	if "accuracy" in eval_metric.lower():
+		plt.ylim([0,1])
+		plt.legend(loc=4)
+	elif "error" in eval_metric.lower():
+		plt.legend(loc=1)
+	else:
+		plt.legend(loc=4)
 	plt.xlim([0,np.round(1.2*max(etas))])
-	plt.legend(loc=4)
-	f.savefig(fig_nameres_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format(eval_metric,n,m,k),bbox_inches='tight')
+	
+	f.savefig(fig_name,bbox_inches='tight')
