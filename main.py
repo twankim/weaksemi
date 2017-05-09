@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-08 22:37:11
+# @Last Modified time: 2017-05-08 23:31:15
 
 import numpy as np
 import time
@@ -29,6 +29,7 @@ def main(args):
 	etas = [float(eta) for eta in args.etas.split(',')]
 	beta = args.beta
 	i_plot = np.random.randint(0,rep) # Index of experiment to plot the figure
+	verbose = args.verbose
 	
 	res_acc = np.zeros((rep,len(qs),len(etas))) # Accuracy of clustering
 	res_mean_acc = np.zeros((rep,len(qs),len(etas))) # Mean accuracy of clustering (per cluster)
@@ -40,7 +41,8 @@ def main(args):
 		# Generate Synthetic data
 		# m dimensional, n points, k cluster
 		# min_gamma: minimum gamma margin
-		print "({}/{})... Generating data".format(i_rep+1,rep)
+		if verbose:
+		    print "({}/{})... Generating data".format(i_rep+1,rep)
 		dataset = genData(n,m,k,args.min_gamma,std)
 		X,y_true = dataset.gen()
 		gamma = dataset.gamma
@@ -50,18 +52,20 @@ def main(args):
 		# Test SSAC algorithm for different q's and eta's (fix beta in this case)
 		for i_q,q in enumerate(qs):
 			# Calculate proper eta and beta based on parameters including delta
-			print "   - Proper eta={}, beta={} (delta={})".format(
-				        dataset.calc_eta(q,delta),dataset.calc_beta(q,delta),delta)
+			if verbose:
+			    print "   - Proper eta={}, beta={} (delta={})".format(
+			 	        dataset.calc_eta(q,delta),dataset.calc_beta(q,delta),delta)
 	
 			algo = weakSSAC(X,y_true,k,q)
 			for i_eta,eta in enumerate(etas):
-				print "     <Test: q={}, eta={}, beta={}>".format(q,eta,beta)
+				if verbose:
+				    print "     <Test: q={}, eta={}, beta={}>".format(q,eta,beta)
 				algo.set_params(eta,beta)
 				algo.fit()
 				
 				y_pred = algo.y
 				mpps = algo.mpps # Estimated cluster centers
-				print "     ... Clustering is done. Number of binary search steps = {}\n".format(algo.bs_num)
+				# print "     ... Clustering is done. Number of binary search steps = {}\n".format(algo.bs_num)
 
 				# For evaluation & plotting, find best permutation of cluster assignment
 				y_pred_perm = find_permutation(dataset,algo)
@@ -70,7 +74,9 @@ def main(args):
 				res_acc[i_rep,i_q,i_eta] = accuracy(y_true,y_pred_perm)
 				res_mean_acc[i_rep,i_q,i_eta] = mean_accuracy(y_true,y_pred_perm)
 	
-				if args.isplot and (i_rep == i_plot):
+				if args.isplot and (i_rep == i_plot) and (m<=2):
+					if verbose:
+					    print " ... Plotting"
 					f = plt.figure(figsize=(14,7))
 					plt.suptitle(r"SSAC with {} weak oracle ($q={},\eta={}, \beta={}$)".format(weak,q,eta,beta))
 	
@@ -96,9 +102,11 @@ def main(args):
 
 	if args.isplot:
 		# Plot Accuracy vs. eta
-		plot_eval("Accuracy",res_acc,qs,etas)
+		fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("acc",n,m,k)
+		plot_eval("Accuracy",res_acc,qs,etas,fig_name)
 		# Plot Mean Accuracy vs. eta
-		plot_eval("Mean Accuracy",res_acc,qs,etas)
+		fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("meanacc",n,m,k)
+		plot_eval("Mean Accuracy",res_acc,qs,etas,fig_name)
 
 		plt.show()
 	
@@ -133,8 +141,11 @@ def parse_args():
                         help='minimum gamma margin (default:1)',
                         default = 1, type = int)
     parser.add_argument('-isplot', dest='isplot',
-                        help='plot the result',
+                        help='plot the result: True/False',
                         default = True, type = str2bool)
+    parser.add_argument('-verbose', dest='verbose',
+                        help='verbose: True/False',
+                        default = False, type = str2bool)
     args = parser.parse_args()
     return args
 

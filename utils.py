@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-08 22:37:40
+# @Last Modified time: 2017-05-08 23:18:29
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -44,9 +44,9 @@ def find_permutation(dataset,algo):
 
 # Plot eta v.s. evaluation
 # res: rep x len(qs) x len(etas)
-def plot_eval(eval_metric,res,qs,etas):
+def plot_eval(eval_metric,res,qs,etas,fig_name):
 	rep = res.shape[0]
-	plt.figure()
+	f = plt.figure()
 	plt.title(r"{} of SSAC (# of experiments={})".format(eval_metric,rep))
 	for i_q,q in enumerate(qs):
 		plt.plot(etas,res.mean(axis=0)[i_q,:],'x-',label=r'$q={}$'.format(q))
@@ -55,3 +55,4 @@ def plot_eval(eval_metric,res,qs,etas):
 	plt.ylim([0,1])
 	plt.xlim([0,np.round(1.2*max(etas))])
 	plt.legend(loc=4)
+	f.savefig(fig_nameres_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format(eval_metric,n,m,k),bbox_inches='tight')
