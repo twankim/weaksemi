@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:19:24
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-09 14:57:57
+# @Last Modified time: 2017-05-10 14:58:00
 
 import numpy as np
 
@@ -49,35 +49,40 @@ class weakSSAC:
 
 			# 2) Cluster Assignment Query
 			y_Z = self.clusterAssign(idx_Z)
-
-			# Find a cluster with maximum number of samples
-			p = self.clusters[np.argmax([y_Z.count(t) for t in self.clusters])]
-			idx_p = idx_Z[np.array(y_Z)==p]
-			mpp = np.mean(self.X[idx_p,:],axis=0)
-			# print "Size of Z_p: {}".format(len(idx_p))
-
-			self.mpps.append(mpp) # Estimated cluster center
-
-			# --------------- Phase 2 ---------------
-			# 1) Sort points in S based on distances from the cluster center.
-			idx_S_sorted = S[np.argsort(np.linalg.norm(
-				                          self.X[S,:]-np.tile(mpp,(len(S),1)),
-				                          axis=1))]
-			# 2) Apply binary serach algorithm
-			idx_radius = self.binarySearch(idx_S_sorted,idx_p)
-
-			# 3) Assign clusters based on the radius.
-			for i_assign in idx_S_sorted[:idx_radius]:
-				self.y[i_assign] = p
-			self.labels.append(p)
-
-			# 4) Exclude assigned points
-			S = np.array(list(set(S)-set(idx_S_sorted[:idx_radius])))
+			if sum(y_Z)==0:
+				print "!!!! Cluster Assignment has failed. (All assigned to cluster 0)"
+			else:
+				# Find a cluster with maximum number of samples
+				p = self.clusters[np.argmax([y_Z.count(t) for t in self.clusters])]
+				idx_p = idx_Z[np.array(y_Z)==p]
+				mpp = np.mean(self.X[idx_p,:],axis=0)
+				# print "Size of Z_p: {}".format(len(idx_p))
+	
+				self.mpps.append(mpp) # Estimated cluster center
+	
+				# --------------- Phase 2 ---------------
+				# 1) Sort points in S based on distances from the cluster center.
+				idx_S_sorted = S[np.argsort(np.linalg.norm(
+					                          self.X[S,:]-np.tile(mpp,(len(S),1)),
+				    	                      axis=1))]
+				# 2) Apply binary serach algorithm
+				idx_radius = self.binarySearch(idx_S_sorted,idx_p)
+	
+				# 3) Assign clusters based on the radius.
+				for i_assign in idx_S_sorted[:idx_radius]:
+					self.y[i_assign] = p
+				self.labels.append(p)
+	
+				# 4) Exclude assigned points
+				S = np.array(list(set(S)-set(idx_S_sorted[:idx_radius])))
 
         # Some Failure cases
 		if len(self.labels) < self.k: # Number of recovered clusters are less than k
 			print "!!!! Number of assigned clusters={} is less than k={}. /(Excluding cluster 0)"\
 			      .format(len(self.labels), self.k)
+			return False
+		else:
+			return True
 
     # Weak Same Cluster Query
 	def weakQuery(self,idx_x,idx_y):

@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-09 18:30:28
+# @Last Modified time: 2017-05-10 14:02:29
 
 import numpy as np
 import time
@@ -33,8 +33,8 @@ def main(args):
 	
 	res_acc = np.zeros((rep,len(qs),len(etas))) # Accuracy of clustering
 	res_mean_acc = np.zeros((rep,len(qs),len(etas))) # Mean accuracy of clustering (per cluster)
-	res_err = np.zeros((rep,len(qs),len(etas))) # Accuracy of clustering
-	res_mean_err = np.zeros((rep,len(qs),len(etas))) # Mean accuracy of clustering (per cluster)
+	res_err = np.zeros((rep,len(qs),len(etas))) # Number of misclustered points
+	res_fail = np.zeros((rep,len(qs),len(etas))) # Number of Failure
 	gammas = np.zeros(rep)
 
 	# Make directories to save results
@@ -69,7 +69,11 @@ def main(args):
 				if verbose:
 				    print "     <Test: q={}, eta={}, beta={}>".format(q,eta,beta)
 				algo.set_params(q,eta,beta)
-				algo.fit()
+				
+				if not algo.fit():
+					# Algorithm has failed
+					res_fail[i_rep,i_q,i_eta] = 1
+					i_plot = np.random.randint(i_rep+1,rep) # Index of experiment to plot the figure
 				
 				y_pred = algo.y
 				mpps = algo.mpps # Estimated cluster centers
@@ -84,11 +88,10 @@ def main(args):
 
 				# Calculate number of errors
 				res_err[i_rep,i_q,i_eta] = numerror(y_true,y_pred_perm)
-				res_mean_err[i_rep,i_q,i_eta] = mean_numerror(y_true,y_pred_perm)
 	
 				if args.isplot and (i_rep == i_plot) and (m<=2):
 					classes = range(k+1)
-					cmap = plt.cm.get_cmap("brg",k+1)
+					cmap = plt.cm.get_cmap("jet", k+1)
 					if verbose:
 					    print " ... Plotting"
 					f = plt.figure(figsize=(14,7))
@@ -134,9 +137,6 @@ def main(args):
 	# Plot Accuracy vs. eta
 	fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("numerr",n,m,k)
 	plot_eval("# Error",res_err,qs,etas,fig_name)
-	# Plot Mean Accuracy vs. eta
-	# fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("meannumerr",n,m,k)
-	# plot_eval("Mean # Error",np.log10(res_mean_err),qs,etas,fig_name)
 
 	# Plot histogram of gammas
 	plot_hist(gammas,args.min_gamma,args.max_gamma)
