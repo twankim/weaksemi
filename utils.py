@@ -2,10 +2,11 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-10 14:06:37
+# @Last Modified time: 2017-05-10 19:52:11
 
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 def accuracy(y_true,y_pred):
 	return np.sum(y_true==y_pred)/float(len(y_true))
@@ -38,7 +39,9 @@ def find_permutation(dataset,algo):
 	means_org = [np.mean(dataset.X[dataset.y==label,:],axis=0) for label in label_org]
 
 	labels_map = {} # Map from algorithm's label to true label
-	labels_map[0] = 0
+	# Initialize label mapping
+	for label in xrange(algo.k+1):
+		labels_map[label] = 0
 
 	if len(algo.labels)==0:
 		return algo.y
@@ -56,6 +59,31 @@ def find_permutation(dataset,algo):
 		del label_org[idx_best]
 
 	return [labels_map[y] for y in algo.y]
+
+# Plot eta v.s. evaluation
+# res: rep x len(qs) x len(etas)
+def print_eval(eval_metric,res,qs,etas,fname,is_sum=False):
+	rep = res.shape[0]
+	if not is_sum:
+		df_res = pd.DataFrame(res.mean(axis=0),
+		                      columns=etas,
+		                      index=qs
+		                      )
+		df_res.index.name="q"
+		df_res.columns.name='eta'
+		print "\n<{} of SSAC (Averaged over {} experiments)>".format(
+			    eval_metric,rep)
+	else:
+		df_res = pd.DataFrame(res.sum(axis=0),
+		                      columns=etas,
+		                      index=qs
+		                      )
+		df_res.index.name="q"
+		df_res.columns.name='eta'
+		print "<\n{} of SSAC (Total Sum over {} experiments)>".format(
+			    eval_metric,rep)
+	print df_res
+	df_res.to_csv(fname)
 
 # Plot eta v.s. evaluation
 # res: rep x len(qs) x len(etas)
@@ -77,7 +105,7 @@ def plot_eval(eval_metric,res,qs,etas,fig_name):
 	
 	f.savefig(fig_name,bbox_inches='tight')
 
-def plot_hist(gammas,min_gamma,max_gamma):
+def plot_hist(gammas,min_gamma,max_gamma,fig_name):
 	rep = len(gammas)
 	f = plt.figure()
 	plt.hist(gammas,normed=True,bins=5)
@@ -85,4 +113,4 @@ def plot_hist(gammas,min_gamma,max_gamma):
 	plt.xlabel(r"$\gamma")
 	plt.ylabel("Probability")
 
-	f.savefig("fig_gamma_hist.pdf",bbox_inches='tight')
+	f.savefig(fig_name,bbox_inches='tight')

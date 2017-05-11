@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-10 14:02:29
+# @Last Modified time: 2017-05-10 19:52:18
 
 import numpy as np
 import time
@@ -69,8 +69,10 @@ def main(args):
 				if verbose:
 				    print "     <Test: q={}, eta={}, beta={}>".format(q,eta,beta)
 				algo.set_params(q,eta,beta)
+
+				success = algo.fit()
 				
-				if not algo.fit():
+				if not success:
 					# Algorithm has failed
 					res_fail[i_rep,i_q,i_eta] = 1
 					i_plot = np.random.randint(i_rep+1,rep) # Index of experiment to plot the figure
@@ -125,23 +127,35 @@ def main(args):
 					plt.close()
 
 	# Write result as table
-	# !!!!!!!!!!Need to be implemented
+	fname = res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("acc",n,m,k)
+	print_eval("Accuracy",res_acc,qs,etas,
+		       res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("acc",n,m,k))
+	print_eval("Mean Accuracy",res_mean_acc,qs,etas,
+		       res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("meanacc",n,m,k))
+	print_eval("# Error",res_err,qs,etas,
+		       res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("numerr",n,m,k))
+	print_eval("# Failure",res_fail,qs,etas,
+		       res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("fail",n,m,k),
+		       True)
 
-	# Plot Accuracy vs. eta
-	fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("acc",n,m,k)
-	plot_eval("Accuracy",res_acc,qs,etas,fig_name)
-	# Plot Mean Accuracy vs. eta
-	fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("meanacc",n,m,k)
-	plot_eval("Mean Accuracy",res_mean_acc,qs,etas,fig_name)
+	if args.isplot:
+		# Plot Accuracy vs. eta
+		fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("acc",n,m,k)
+		plot_eval("Accuracy",res_acc,qs,etas,fig_name)
 
-	# Plot Accuracy vs. eta
-	fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("numerr",n,m,k)
-	plot_eval("# Error",res_err,qs,etas,fig_name)
+		# Plot Mean Accuracy vs. eta
+		fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("meanacc",n,m,k)
+		plot_eval("Mean Accuracy",res_mean_acc,qs,etas,fig_name)
 
-	# Plot histogram of gammas
-	plot_hist(gammas,args.min_gamma,args.max_gamma)
+		# Plot Accuracy vs. eta
+		fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("numerr",n,m,k)
+		plot_eval("# Error",res_err,qs,etas,fig_name)
 
-	plt.show()
+		# Plot histogram of gammas
+		fig_name = res_dir+'/fig_gamma_hist.pdf'
+		plot_hist(gammas,args.min_gamma,args.max_gamma,fig_name)
+
+		plt.show()
 	
 def parse_args():
     def str2bool(v):

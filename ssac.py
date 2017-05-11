@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:19:24
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-10 14:58:00
+# @Last Modified time: 2017-05-10 17:58:05
 
 import numpy as np
 
@@ -122,8 +122,7 @@ class weakSSAC:
 					if len(self.clusters) < self.k:
 						self.clusters.append(len(self.clusters)+1)
 						y_Z[i] = len(self.clusters)
-						# Update cluster assignment
-						self.y[idx] = y_Z[i]
+						self.y[idx] = y_Z[i] # Update cluster assignment
 				# If all k same-cluster queries are not-sure
 				# -> Assign as cluster 0 (Fail in cluster assignment query)
 		return y_Z
