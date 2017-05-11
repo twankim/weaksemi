@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-10 19:52:18
+# @Last Modified time: 2017-05-11 16:33:16
 
 import numpy as np
 import time
@@ -49,7 +49,7 @@ def main(args):
 		# m dimensional, n points, k cluster
 		# min_gamma: minimum gamma margin
 		if verbose:
-		    print "({}/{})... Generating data".format(i_rep+1,rep)
+			print "({}/{})... Generating data".format(i_rep+1,rep)
 		dataset = genData(n,m,k,args.min_gamma,args.max_gamma,std)
 		X,y_true = dataset.gen()
 		gamma = dataset.gamma
@@ -62,17 +62,15 @@ def main(args):
 		for i_q,q in enumerate(qs):
 			# Calculate proper eta and beta based on parameters including delta
 			if verbose:
-			    print "   - Proper eta={}, beta={} (delta={})".format(
-			 	        dataset.calc_eta(q,delta),dataset.calc_beta(q,delta),delta)
+				print "   - Proper eta={}, beta={} (delta={})".format(
+					    dataset.calc_eta(q,delta),dataset.calc_beta(q,delta),delta)
 	
 			for i_eta,eta in enumerate(etas):
 				if verbose:
-				    print "     <Test: q={}, eta={}, beta={}>".format(q,eta,beta)
+					print "     <Test: q={}, eta={}, beta={}>".format(q,eta,beta)
 				algo.set_params(q,eta,beta)
 
-				success = algo.fit()
-				
-				if not success:
+				if not algo.fit():
 					# Algorithm has failed
 					res_fail[i_rep,i_q,i_eta] = 1
 					i_plot = np.random.randint(i_rep+1,rep) # Index of experiment to plot the figure
@@ -95,7 +93,7 @@ def main(args):
 					classes = range(k+1)
 					cmap = plt.cm.get_cmap("jet", k+1)
 					if verbose:
-					    print " ... Plotting"
+						print " ... Plotting"
 					f = plt.figure(figsize=(14,7))
 					plt.suptitle(r"SSAC with {} weak oracle ($q={},\eta={}, \beta={}$)".format(weak,q,eta,beta))
 	
@@ -113,7 +111,7 @@ def main(args):
 					for i in xrange(0,k+1):
 						idx = np.array(y_pred_perm)==i
 						if sum(idx)>0:
-						    plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i])
+							plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i])
 					# plt.scatter(X[:,0],X[:,1],c=y_pred_perm,label=classes)
 					plt.title("SSAC result ($\gamma$={:.2f})".format(gamma))
 					plt.legend()
@@ -128,9 +126,9 @@ def main(args):
 
 	# Write result as table
 	fname = res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("acc",n,m,k)
-	print_eval("Accuracy",res_acc,qs,etas,
+	print_eval("Accuracy(%)",res_acc,qs,etas,
 		       res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("acc",n,m,k))
-	print_eval("Mean Accuracy",res_mean_acc,qs,etas,
+	print_eval("Mean Accuracy(%)",res_mean_acc,qs,etas,
 		       res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("meanacc",n,m,k))
 	print_eval("# Error",res_err,qs,etas,
 		       res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("numerr",n,m,k))
@@ -141,11 +139,11 @@ def main(args):
 	if args.isplot:
 		# Plot Accuracy vs. eta
 		fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("acc",n,m,k)
-		plot_eval("Accuracy",res_acc,qs,etas,fig_name)
+		plot_eval("Accuracy(%)",res_acc,qs,etas,fig_name)
 
 		# Plot Mean Accuracy vs. eta
 		fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("meanacc",n,m,k)
-		plot_eval("Mean Accuracy",res_mean_acc,qs,etas,fig_name)
+		plot_eval("Mean Accuracy(%)",res_mean_acc,qs,etas,fig_name)
 
 		# Plot Accuracy vs. eta
 		fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("numerr",n,m,k)

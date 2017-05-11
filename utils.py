@@ -2,21 +2,21 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-10 19:52:11
+# @Last Modified time: 2017-05-11 16:33:41
 
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
 def accuracy(y_true,y_pred):
-	return np.sum(y_true==y_pred)/float(len(y_true))
+	return 100*np.sum(y_true==y_pred)/float(len(y_true))
 
 def mean_accuracy(y_true,y_pred):
 	labels = np.unique(y_true)
 	accuracy = np.zeros(len(labels))
 	hamming = y_true==y_pred
 
-	accuracy = [np.sum(hamming[y_true==label])/float(np.sum(y_true==label))\
+	accuracy = [100*np.sum(hamming[y_true==label])/float(np.sum(y_true==label))\
 	            for label in labels]
 	return np.mean(accuracy)
 
@@ -80,7 +80,7 @@ def print_eval(eval_metric,res,qs,etas,fname,is_sum=False):
 		                      )
 		df_res.index.name="q"
 		df_res.columns.name='eta'
-		print "<\n{} of SSAC (Total Sum over {} experiments)>".format(
+		print "\n<{} of SSAC (Total Sum over {} experiments)>".format(
 			    eval_metric,rep)
 	print df_res
 	df_res.to_csv(fname)

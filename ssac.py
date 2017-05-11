@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:19:24
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-10 17:58:05
+# @Last Modified time: 2017-05-11 17:47:25
 
 import numpy as np
 
@@ -39,7 +39,7 @@ class weakSSAC:
 		self.labels = [] # Cluster labels which are recovered (correspond to mpps)
 		self.clusters=[] # Cluster labels which are known
 
-		for i in xrange(self.k):
+		for i_k in xrange(self.k):
 			# --------------- Phase 1 ---------------
 			# 1) Sample points for cluster center estimation
 			if r >= len(S):
@@ -50,13 +50,17 @@ class weakSSAC:
 			# 2) Cluster Assignment Query
 			y_Z = self.clusterAssign(idx_Z)
 			if sum(y_Z)==0:
-				print "!!!! Cluster Assignment has failed. (All assigned to cluster 0)"
+				print "    !!! Not-sure in Cluster Assignment. (q,eta,beta)=({},{},{}), i_k={}"\
+				       .format(self.q,self.eta,self.beta,i_k)    
 			else:
 				# Find a cluster with maximum number of samples
 				p = self.clusters[np.argmax([y_Z.count(t) for t in self.clusters])]
 				idx_p = idx_Z[np.array(y_Z)==p]
 				mpp = np.mean(self.X[idx_p,:],axis=0)
 				# print "Size of Z_p: {}".format(len(idx_p))
+				if p in self.labels:
+					print "    !!! Cluster p revisited (q,eta,beta)=({},{},{}), i_k={}".format(
+						          self.q,self.eta,self.beta,i_k)
 	
 				self.mpps.append(mpp) # Estimated cluster center
 	
@@ -72,14 +76,29 @@ class weakSSAC:
 				for i_assign in idx_S_sorted[:idx_radius]:
 					self.y[i_assign] = p
 				self.labels.append(p)
+
+				# Check whether assignment is overwrited
+				if len(self.clusters) > len(set(self.y)):
+					print "    Overwrited!!!!!!!"
+					deleted_clusters = list(set(self.clusters)-set(self.y))
+					# Update self.clusters to delete erased clusters
+					self.clusters = [cluster for cluster in self.clusters \
+					                 if (cluster not in deleted_clusters)]
+
+					# Update self.labels if affected
+					self.mpps = [self.mpps[j] for j in xrange(len(self.mpps)) \
+					             if (self.labels[j] not in deleted_clusters)]
+					self.labels = [label for label in self.labels \
+					               if (label not in deleted_clusters)]
+
 	
 				# 4) Exclude assigned points
 				S = np.array(list(set(S)-set(idx_S_sorted[:idx_radius])))
 
         # Some Failure cases
 		if len(self.labels) < self.k: # Number of recovered clusters are less than k
-			print "!!!! Number of assigned clusters={} is less than k={}. /(Excluding cluster 0)"\
-			      .format(len(self.labels), self.k)
+			print "    !!! Number of assigned clusters={} is less than k={}. (q,eta,beta)=({},{},{})"\
+			      .format(len(self.labels),self.k,self.q,self.eta,self.beta)
 			return False
 		else:
 			return True
@@ -100,30 +119,34 @@ class weakSSAC:
 	def clusterAssign(self,idx_Z):
 		y_Z = [0]*len(idx_Z)
 		for i,idx in enumerate(idx_Z):
-			if len(self.clusters)==0:
-				# Currently, none of points are assigned
+			if len(self.clusters)==0: # Currently, none of points are assigned
 				answers = []
 				# Assign initial point 
 				y_Z[i] = 1
 				self.clusters.append(1)
-				# Update cluster assignment
-				self.y[idx] = y_Z[i]
+				if (self.y[idx]!=y_Z[i]) and (self.y[idx]!=0):
+					print "    !!!!! Something wrong (1)"
+				self.y[idx] = y_Z[i] # Update cluster assignment
 			else:
 				# Find anchor points from each cluster (Use assignment-known points)
-			    # -> Use for cluster assignment queries
+				# -> Use for cluster assignment queries
 				set_idx = [self.y.index(k) for k in self.clusters]
 				# Ask same-cluster queries
 				answers = [self.weakQuery(idx,idx_set) for idx_set in set_idx]
 				if 1 in answers:
 					y_Z[i] = self.y[set_idx[answers.index(1)]]
 					if y_Z[i] == 0:
-						print "Something Wrong!!!!!!!!! (Assigned index has cluster 0)"
+						print "    Something Wrong!!!!!!!!! (Assigned index has cluster 0)"
 				elif sum(answers) == -len(self.clusters):
 					if len(self.clusters) < self.k:
-						self.clusters.append(len(self.clusters)+1)
-						y_Z[i] = len(self.clusters)
+						y_Z[i] = [k_n for k_n in xrange(1,self.k+1) if k_n not in self.clusters][0]
+						self.clusters.append(y_Z[i])
+						if (self.y[idx]!=y_Z[i]) and (self.y[idx]!=0):
+							print "   !!!!! Something wrong (2)"
 						self.y[idx] = y_Z[i] # Update cluster assignment
-				# If all k same-cluster queries are not-sure
+					else:
+						print "    !!!! Something Wrong. Got k -1 Answers."
+				# If k same-cluster queries ended up as not-sure
 				# -> Assign as cluster 0 (Fail in cluster assignment query)
 		return y_Z
 
@@ -142,8 +165,9 @@ class weakSSAC:
 				idx_l = idx_j+1
 			elif answer == -1: # Different cluster
 				idx_r = idx_j-1
-			else: # Not sure
-			    # Sample beta-1 additional points
+			else:
+				# Not sure
+				# Sample beta-1 additional points
 				set_idx_B = np.random.randint(0,len(idx_p),self.beta-1)
 				answers = [self.weakQuery(idx_p[idx_B],
 					                      idx_S_sorted[idx_j]) for idx_B in set_idx_B]
@@ -154,7 +178,7 @@ class weakSSAC:
 				else:
 					# Can return fail, but regard it as not in the same cluster
 					# Follows the unified-weak BinarySearch model.
-					print "Not-sure in binary search (Fail) -> Regard as different clusters"
+					print "    Not-sure in Binary Search. -> Regard as different clusters"
 					idx_r = idx_j-1
 			bs_num += 1
 

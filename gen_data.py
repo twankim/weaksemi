@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 00:06:53
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-09 10:36:10
+# @Last Modified time: 2017-05-10 21:51:51
 
 import numpy as np
 from sklearn.datasets import make_blobs
@@ -45,8 +45,8 @@ class genData:
 			return int(np.ceil( 8*np.log(2*self.k*(self.m+1)/delta) / (self.gamma-1)**2 ))
 	
 	def calc_beta(self,q,delta):
-	    assert (q >0) and (q<=1), "q must be in (0,1]"
-	    if q < 1:
-	    	return int(np.ceil(np.log(2*self.k*np.log(self.n)/delta) / np.log(1.0/(1-q))))
-	    else:
-	    	return 1
+		assert (q >0) and (q<=1), "q must be in (0,1]"
+		if q < 1:
+			return int(np.ceil(np.log(2*self.k*np.log(self.n)/delta) / np.log(1.0/(1-q))))
+		else:
+			return 1
