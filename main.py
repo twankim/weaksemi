@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-11 22:13:45
+# @Last Modified time: 2017-05-11 23:16:51
 
 import numpy as np
 import time
@@ -33,7 +33,7 @@ def main(args):
     
     res_acc = np.zeros((rep,len(qs),len(etas))) # Accuracy of clustering
     res_mean_acc = np.zeros((rep,len(qs),len(etas))) # Mean accuracy of clustering (per cluster)
-    res_err = np.zeros((rep,len(qs),len(etas))) # Number of misclustered points
+    # res_err = np.zeros((rep,len(qs),len(etas))) # Number of misclustered points
     res_fail = np.zeros((rep,len(qs),len(etas))) # Number of Failure
     gammas = np.zeros(rep)
 
@@ -86,8 +86,8 @@ def main(args):
                 res_acc[i_rep,i_q,i_eta] = accuracy(y_true,y_pred_perm)
                 res_mean_acc[i_rep,i_q,i_eta] = mean_accuracy(y_true,y_pred_perm)
 
-                # Calculate number of errors
-                res_err[i_rep,i_q,i_eta] = numerror(y_true,y_pred_perm)
+                # # Calculate number of errors
+                # res_err[i_rep,i_q,i_eta] = error(y_true,y_pred_perm)
     
                 if args.isplot and (i_rep == i_plot) and (m<=2):
                     classes = range(k+1)
@@ -130,9 +130,9 @@ def main(args):
                res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("acc",n,m,k))
     print_eval("Mean Accuracy(%)",res_mean_acc,qs,etas,
                res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("meanacc",n,m,k))
-    print_eval("# Error",res_err,qs,etas,
-               res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("numerr",n,m,k))
-    print_eval("# Failure",res_fail,qs,etas,
+    # print_eval("# Error(%)",res_err,qs,etas,
+    #            res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("err",n,m,k))
+    print_eval("# Failure(%)",res_fail,qs,etas,
                res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("fail",n,m,k),
                True)
 
@@ -145,9 +145,9 @@ def main(args):
         fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("meanacc",n,m,k)
         plot_eval("Mean Accuracy(%)",res_mean_acc,qs,etas,fig_name)
 
-        # Plot Accuracy vs. eta
-        fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("numerr",n,m,k)
-        plot_eval("# Error",res_err,qs,etas,fig_name)
+        # # Plot Accuracy vs. eta
+        # fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("err",n,m,k)
+        # plot_eval("# Error",res_err,qs,etas,fig_name)
 
         # Plot histogram of gammas
         fig_name = res_dir+'/fig_gamma_hist.pdf'
@@ -187,7 +187,7 @@ def parse_args():
                         default = 1.0, type = float)
     parser.add_argument('-g_max', dest='max_gamma',
                         help='minimum gamma margin (default:1)',
-                        default = 1.25, type = float)
+                        default = 1.2, type = float)
     parser.add_argument('-isplot', dest='isplot',
                         help='plot the result: True/False',
                         default = True, type = str2bool)

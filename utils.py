@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-11 22:14:20
+# @Last Modified time: 2017-05-11 23:09:15
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,20 +16,21 @@ def mean_accuracy(y_true,y_pred):
     accuracy = np.zeros(len(labels))
     hamming = y_true==y_pred
 
-    accuracy = [100*np.sum(hamming[y_true==label])/float(np.sum(y_true==label))\
+    accuracy = [100*np.sum(hamming[y_true==label])/float(np.sum(y_true==label)) \
                 for label in labels]
     return np.mean(accuracy)
 
-def numerror(y_true,y_pred):
-    return np.sum(y_true!=y_pred)
+def error(y_true,y_pred):
+    return 100*np.sum(y_true!=y_pred)/float(len(y_true))
 
-def mean_numerror(y_true,y_pred):
+def mean_error(y_true,y_pred):
     labels = np.unique(y_true)
     num_error = np.zeros(len(labels))
     hamming = y_true!=y_pred
 
-    accuracy = [np.sum(hamming[y_true==label]) for label in labels]
-    return np.mean(num_error)
+    error = [100*np.sum(hamming[y_true==label])/float(np.sum(y_true==label)) \
+             for label in labels]
+    return np.mean(error)
 
 # Find best matching permutation of y_pred clustering
 # Also need to change mpp of algorithm
