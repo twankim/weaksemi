@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-12 00:09:45
+# @Last Modified time: 2017-05-12 11:18:28
 
 import numpy as np
 import time
@@ -121,7 +121,7 @@ def main(args):
                         mpp = mpps[t]
                         plt.plot(mpp[0],mpp[1],'w^',ms=15)
 
-                    f.savefig(res_dir+'/fig_n{}_m{}_k{}_q{}_e{}.pdf'.format(n,m,k,q,eta),bbox_inches='tight')
+                    f.savefig(res_dir+'/fig_n{}_m{}_k{}_q{}_e{}.png'.format(n,m,k,q,eta),bbox_inches='tight')
                     plt.close()
 
     # Write result as table
