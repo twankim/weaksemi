@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-11 23:30:24
+# @Last Modified time: 2017-05-11 23:42:10
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -108,10 +108,14 @@ def plot_eval(eval_metric,res,qs,etas,fig_name):
 
 def plot_hist(gammas,min_gamma,max_gamma,fig_name):
     rep = len(gammas)
+    if rep>40:
+        n_bins = int(rep/20)
+    else:
+        n_bins = 10
     f = plt.figure()
-    plt.hist(gammas,normed=True,bins=5)
+    plt.hist(gammas,normed=False,bins=n_bins)
     plt.title(r"Histogram of $\gamma$. min={}, max={} ({} generation)".format(min_gamma,max_gamma,rep))
     plt.xlabel(r"$\gamma$")
-    plt.ylabel("Probability")
+    plt.ylabel("Number of data generations")
 
     f.savefig(fig_name,bbox_inches='tight')
