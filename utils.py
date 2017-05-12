@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-11 23:09:15
+# @Last Modified time: 2017-05-11 23:30:24
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -111,7 +111,7 @@ def plot_hist(gammas,min_gamma,max_gamma,fig_name):
     f = plt.figure()
     plt.hist(gammas,normed=True,bins=5)
     plt.title(r"Histogram of $\gamma$. min={}, max={} ({} generation)".format(min_gamma,max_gamma,rep))
-    plt.xlabel(r"$\gamma")
+    plt.xlabel(r"$\gamma$")
     plt.ylabel("Probability")
 
     f.savefig(fig_name,bbox_inches='tight')
