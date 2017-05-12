@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-11 23:16:51
+# @Last Modified time: 2017-05-12 00:09:45
 
 import numpy as np
 import time
@@ -132,7 +132,7 @@ def main(args):
                res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("meanacc",n,m,k))
     # print_eval("# Error(%)",res_err,qs,etas,
     #            res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("err",n,m,k))
-    print_eval("# Failure(%)",res_fail,qs,etas,
+    print_eval("# Failure",res_fail,qs,etas,
                res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("fail",n,m,k),
                True)
 
