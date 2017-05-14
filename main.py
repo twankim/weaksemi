@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-12 11:18:28
+# @Last Modified time: 2017-05-13 22:02:49
 
 import numpy as np
 import time
@@ -17,7 +17,6 @@ from utils import *
 
 weak = "randaom"
 delta = 0.99
-std = 1.5
 base_dir='./results'
 
 def main(args):
@@ -25,6 +24,7 @@ def main(args):
     k = args.k
     n = args.n
     m = args.m
+    std = args.std
     qs = [float(q) for q in args.qs.split(',')]
     etas = [float(eta) for eta in args.etas.split(',')]
     beta = args.beta
@@ -169,10 +169,13 @@ def parse_args():
                         default = 3, type = int)
     parser.add_argument('-n', dest='n',
                         help='Number of data points in synthetic data',
-                        default = 5000, type = int)
+                        default = 3000, type = int)
     parser.add_argument('-m', dest='m',
                         help='Dimension of data points in synthetic data',
                         default = 2, type = int)
+    parser.add_argument('-std', dest='std',
+                        help='standard deviation of Gaussian distribution (default:1.5)',
+                        default = 1.75, type = float)
     parser.add_argument('-qs', dest='qs',
                         help='Probabilities q (not-sure with 1-q) ex) 0.7,0.85,1',
                         default = '0.7,0.85,1', type = str)
