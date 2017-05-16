@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-13 22:02:49
+# @Last Modified time: 2017-05-16 03:03:06
 
 import numpy as np
 import time
@@ -163,13 +163,13 @@ def parse_args():
                         'Test Semi-Supervised Active Clustering with Weak Oracles: Random-weak model')
     parser.add_argument('-rep', dest='rep',
                         help='Number of experiments to repeat',
-                        default = 50, type = int)
+                        default = 5000, type = int)
     parser.add_argument('-k', dest='k',
                         help='Number of clusters in synthetic data',
                         default = 3, type = int)
     parser.add_argument('-n', dest='n',
                         help='Number of data points in synthetic data',
-                        default = 3000, type = int)
+                        default = 1500, type = int)
     parser.add_argument('-m', dest='m',
                         help='Dimension of data points in synthetic data',
                         default = 2, type = int)
@@ -190,7 +190,7 @@ def parse_args():
                         default = 1.0, type = float)
     parser.add_argument('-g_max', dest='max_gamma',
                         help='minimum gamma margin (default:1)',
-                        default = 1.2, type = float)
+                        default = 1.1, type = float)
     parser.add_argument('-isplot', dest='isplot',
                         help='plot the result: True/False',
                         default = True, type = str2bool)
