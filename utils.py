@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-11 23:42:10
+# @Last Modified time: 2017-05-18 14:14:23
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -88,17 +88,25 @@ def print_eval(eval_metric,res,qs,etas,fname,is_sum=False):
 
 # Plot eta v.s. evaluation
 # res: rep x len(qs) x len(etas)
-def plot_eval(eval_metric,res,qs,etas,fig_name):
+def plot_eval(eval_metric,res,qs,etas,fig_name,is_sum=False):
     rep = res.shape[0]
-    f = plt.figure()
-    plt.title(r"{} of SSAC (Averaged over {} experiments)".format(eval_metric,rep))
-    for i_q,q in enumerate(qs):
-        plt.plot(etas,res.mean(axis=0)[i_q,:],'x-',label=r'$q={}$'.format(q))
-    plt.xlabel(r"$\eta$ (Number of samples per cluster)")
-    plt.ylabel(eval_metric)
+    if not is_sum:
+        f = plt.figure()
+        plt.title(r"{} of SSAC (Averaged over {} experiments)".format(eval_metric,rep))
+        for i_q,q in enumerate(qs):
+            plt.plot(etas,res.mean(axis=0)[i_q,:],'x-',label=r'$q={}$'.format(q))
+            plt.xlabel(r"$\eta$ (Number of samples per cluster)")
+        plt.ylabel(eval_metric)
+    else:
+        f = plt.figure()
+        plt.title(r"{} of SSAC (Total sum over {} experiments)".format(eval_metric,rep))
+        for i_q,q in enumerate(qs):
+            plt.plot(etas,res.sum(axis=0)[i_q,:],'x-',label=r'$q={}$'.format(q))
+            plt.xlabel(r"$\eta$ (Number of samples per cluster)")
+        plt.ylabel(eval_metric)
     if "accuracy" in eval_metric.lower():
         plt.legend(loc=4)
-    elif "error" in eval_metric.lower():
+    elif ("error" in eval_metric.lower()) or ("fail" in eval_metric.lower()):
         plt.legend(loc=1)
     else:
         plt.legend(loc=4)
