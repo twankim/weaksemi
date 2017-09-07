@@ -6,18 +6,31 @@ Here, we provide an implementation of our weak SSAC algorithm with an option of 
 
 ## How to run our code
 You will run the main.py file with several options.
+
 -rep "Number of experiments to repeat"
+
 -k "Number of clusters in synthetic data"
+
 -n "Number of data points in synthetic data"
+
 -m "Dimension of data points in synthetic data"
+
 -std "Standard deviation of Guassian distribution in generating data"
+
 -qs "Probabilities q to test. Oracle says not-sure with probability at most 1-q. ex) 0.7,0.85,1"
+
 -etas "Parameters for sampling in Phase 1 of the algorithm. ex) 10,50"
+
 -beta "Parameter for sampling in Phase 2 of the algorithm. ex) 10"
+
 -g_min "Minimum gamma margin for generating data"
+
 -g_max "Maximum gamma margin for generating data"
+
 -isplot "Plot the result True/False"
+
 -verbose "True/False"
+
 ex)
 ```
 python main.py -k 3 -qs 0.7,0.85,1 -etas 2,5,10,50 -g_min 1.0 -g_max 1.2
