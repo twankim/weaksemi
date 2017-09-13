@@ -2,7 +2,11 @@
 ## Overview
 We provide a novel and efficient semi-supervised active clustering algorithms for center-based clustering task, which can discover the inherent clustering of an imperfect oracle. Our work is motivated by the [SSAC algorithm](https://papers.nips.cc/paper/6449-clustering-with-same-cluster-queries.pdf), and the following question: “Is it possible to perform a clustering task efficiently even with a non-ideal domain expert?”. We answer this question by formulating different types of weak oracles and prove that the SSAC algorithm can still work well under uncertainties by using properly modified binary search schemes.
 
-**Same-cluster Query**: Are these two points in the same cluster?
+- **Weak Same-cluster Query**: Are these two points in the same cluster?
+- **Answer**
+  - *Yes*
+  - *No*
+  - *Not-sure*
 
 Here, we provide an implementation of our weak SSAC algorithm with an option of using **Random-Weak Oracle Model**, i.e. answers “*not-sure*” randomly with some fixed probability. Synthetic data is generated using Guassian distribution with several options. The algorithm is guaranteed to recover a ground truth clustering of the data with high probability. Please read our [paper](https://arxiv.org/abs/1709.03202) for details. We implemented the unified version of weak SSAC algorithm which can handle both random-weak and distance-weak oracles.
 
@@ -38,5 +42,3 @@ ex)
 ```
 python main.py -k 3 -qs 0.7,0.85,1 -etas 2,5,10,50 -g_min 1.0 -g_max 1.2
 ```
-
-## Examples
