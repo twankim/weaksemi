@@ -2,12 +2,12 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:19:24
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-11 23:04:50
+# @Last Modified time: 2017-10-17 02:45:35
 
 import numpy as np
 
 class weakSSAC:
-    def __init__(self,X,y_true,k,q=1,wtype="random"):
+    def __init__(self,X,y_true,k,q=1,wtype="random",ris=None):
         self.X = X
         self.n, self.m = np.shape(X)
         self.y_true = y_true
@@ -17,13 +17,16 @@ class weakSSAC:
         self.eta = np.log2(self.n)
         self.beta = 1
         self.wtype = wtype
-        self.wtype_list = ["random"]
-        # self.wtype_list = ["random","local-distance","global-distance"]
+        self.wtype_list = ["random","local","global"]
+        self.ris = ris
+        self.centers = [np.mean(X[y_true==i],axis=0) for i in xrange(k)]
 
-    def set_params(self,q,eta,beta):
-        self.q = q
+    def set_params(self,eta,beta,q=1,rho=rho,nu=nu):
         self.eta = eta
         self.beta = beta
+        self.q = q
+        self.rho = rho
+        self.nu = nu
 
     def set_wtype(self,wtype):
         assert wtype in self.wtype_list,\
@@ -118,6 +121,29 @@ class weakSSAC:
         if self.wtype == "random":
             return np.random.binomial(1,self.q)*\
                    2*(int(self.y_true[idx_x]==self.y_true[idx_y])-0.5)
+        elif self.wtype == "local":
+            d_xy = np.linalg.norm(self.X[idx_x]-self.X[idx_y])
+            if y_true[idx_x]==y_true[idx_y]:
+                d_xi = np.linalg.norm(self.X[idx_x]-self.centers[y_true[idx_x]])
+                d_yi = np.linalg.norm(self.X[idx_y]-self.centers[y_true[idx_y]])
+                if (self.nu-1)*min(d_xi,d_yi)>d_xy:
+                    return 0
+            else:
+                if d_xy > 2*self.rho*self.ris[y_true[idx_x]]:
+                    return 0
+            return 2*(int(self.y_true[idx_x]==self.y_true[idx_y])-0.5)
+        elif self.wtype == "global":
+            d_xy = np.linalg.norm(self.X[idx_x]-self.X[idx_y])
+            if y_true[idx_x]==y_true[idx_y]:
+                d_xi = np.linalg.norm(self.X[idx_x]-self.centers[y_true[idx_x]])
+                d_yi = np.linalg.norm(self.X[idx_y]-self.centers[y_true[idx_y]])
+                if (self.rho*self.ris[y_true[idx_x]]<d_xi) | \
+                   (self.rho*self.ris[y_true[idx_y]]<d_yi):
+                    return 0
+            else:
+                if d_xy > 2*self.rho*self.ris[y_true[idx_x]]:
+                    return 0
+            return 2*(int(self.y_true[idx_x]==self.y_true[idx_y])-0.5)
         else:
             print "Not sure!!!"
             return 0

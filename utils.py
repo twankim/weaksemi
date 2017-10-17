@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-18 14:14:23
+# @Last Modified time: 2017-10-17 01:41:16
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -63,56 +63,58 @@ def find_permutation(dataset,algo):
 
 # Plot eta v.s. evaluation
 # res: rep x len(qs) x len(etas)
-def print_eval(eval_metric,res,qs,etas,fname,is_sum=False):
-    rep = res.shape[0]
-    if not is_sum:
-        df_res = pd.DataFrame(res.mean(axis=0),
-                              columns=etas,
-                              index=qs
-                              )
-        df_res.index.name="q"
-        df_res.columns.name='eta'
-        print "\n<{} of SSAC (Averaged over {} experiments)>".format(
-                eval_metric,rep)
-    else:
-        df_res = pd.DataFrame(res.sum(axis=0),
-                              columns=etas,
-                              index=qs
-                              )
-        df_res.index.name="q"
-        df_res.columns.name='eta'
-        print "\n<{} of SSAC (Total Sum over {} experiments)>".format(
-                eval_metric,rep)
-    print df_res
-    df_res.to_csv(fname)
+def print_eval(eval_metric,res,etas,fname,is_sum=False,qs=None):
+    if qs:
+        rep = res.shape[0]
+        if not is_sum:
+            df_res = pd.DataFrame(res.mean(axis=0),
+                                  columns=etas,
+                                  index=qs
+                                  )
+            df_res.index.name="q"
+            df_res.columns.name='eta'
+            print "\n<{} of SSAC (Averaged over {} experiments)>".format(
+                    eval_metric,rep)
+        else:
+            df_res = pd.DataFrame(res.sum(axis=0),
+                                  columns=etas,
+                                  index=qs
+                                  )
+            df_res.index.name="q"
+            df_res.columns.name='eta'
+            print "\n<{} of SSAC (Total Sum over {} experiments)>".format(
+                    eval_metric,rep)
+        print df_res
+        df_res.to_csv(fname)
 
 # Plot eta v.s. evaluation
 # res: rep x len(qs) x len(etas)
-def plot_eval(eval_metric,res,qs,etas,fig_name,is_sum=False):
-    rep = res.shape[0]
-    if not is_sum:
-        f = plt.figure()
-        plt.title(r"{} of SSAC (Averaged over {} experiments)".format(eval_metric,rep))
-        for i_q,q in enumerate(qs):
-            plt.plot(etas,res.mean(axis=0)[i_q,:],'x-',label=r'$q={}$'.format(q))
-            plt.xlabel(r"$\eta$ (Number of samples per cluster)")
-        plt.ylabel(eval_metric)
-    else:
-        f = plt.figure()
-        plt.title(r"{} of SSAC (Total sum over {} experiments)".format(eval_metric,rep))
-        for i_q,q in enumerate(qs):
-            plt.plot(etas,res.sum(axis=0)[i_q,:],'x-',label=r'$q={}$'.format(q))
-            plt.xlabel(r"$\eta$ (Number of samples per cluster)")
-        plt.ylabel(eval_metric)
-    if "accuracy" in eval_metric.lower():
-        plt.legend(loc=4)
-    elif ("error" in eval_metric.lower()) or ("fail" in eval_metric.lower()):
-        plt.legend(loc=1)
-    else:
-        plt.legend(loc=4)
-    plt.xlim([0,np.round(1.2*max(etas))])
-    
-    f.savefig(fig_name,bbox_inches='tight')
+def plot_eval(eval_metric,res,etas,fig_name,is_sum=False,qs=None):
+    if qs:
+        rep = res.shape[0]
+        if not is_sum:
+            f = plt.figure()
+            plt.title(r"{} of SSAC (Averaged over {} experiments)".format(eval_metric,rep))
+            for i_q,q in enumerate(qs):
+                plt.plot(etas,res.mean(axis=0)[i_q,:],'x-',label=r'$q={}$'.format(q))
+                plt.xlabel(r"$\eta$ (Number of samples per cluster)")
+            plt.ylabel(eval_metric)
+        else:
+            f = plt.figure()
+            plt.title(r"{} of SSAC (Total sum over {} experiments)".format(eval_metric,rep))
+            for i_q,q in enumerate(qs):
+                plt.plot(etas,res.sum(axis=0)[i_q,:],'x-',label=r'$q={}$'.format(q))
+                plt.xlabel(r"$\eta$ (Number of samples per cluster)")
+            plt.ylabel(eval_metric)
+        if "accuracy" in eval_metric.lower():
+            plt.legend(loc=4)
+        elif ("error" in eval_metric.lower()) or ("fail" in eval_metric.lower()):
+            plt.legend(loc=1)
+        else:
+            plt.legend(loc=4)
+        plt.xlim([0,np.round(1.2*max(etas))])
+        
+        f.savefig(fig_name,bbox_inches='tight')
 
 def plot_hist(gammas,min_gamma,max_gamma,fig_name):
     rep = len(gammas)

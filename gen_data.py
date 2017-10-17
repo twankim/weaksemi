@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 00:06:53
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-05-11 22:14:10
+# @Last Modified time: 2017-10-16 23:52:22
 
 import numpy as np
 from sklearn.datasets import make_blobs
@@ -16,6 +16,7 @@ class genData:
         self.min_gamma = min_gamma
         self.max_gamma = max_gamma
         self.gamma = 0
+        self.ris = np.zeros(self.k)
 
     def gen(self):
         while (self.gamma <= self.min_gamma) or (self.gamma > self.max_gamma):
@@ -27,6 +28,7 @@ class genData:
                 ri = max(np.linalg.norm(X[y==i,:]-np.tile(X_means[i],(sum(y==i),1)),axis=1))
                 ra = min(np.linalg.norm(X[y!=i,:]-np.tile(X_means[i],(sum(y!=i),1)),axis=1))
                 gammas.append(ra/float(ri))
+                self.ris[i] = ri
 
             y += 1
             self.gamma = min(gammas)
