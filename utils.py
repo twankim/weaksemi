@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-18 11:53:15
+# @Last Modified time: 2017-10-18 13:03:02
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -69,7 +69,7 @@ def print_eval(eval_metric,res,etas,fname,is_sum=False,weak='random',params=None
     if weak == 'random':
         i_name = 'q'
     else:
-        i_name = 'c_dist'
+        i_name = 'c_{dist}'
 
     rep = res.shape[0]
     if not is_sum:
