@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-17 02:42:37
+# @Last Modified time: 2017-10-18 12:41:43
 
 import numpy as np
 import time
@@ -17,7 +17,7 @@ from utils import *
 
 weak = "local"
 delta = 0.99
-base_dir='./results'
+base_dir= os.path.join('./results',weak)
 
 def main(args):
     rep = args.rep
@@ -30,17 +30,16 @@ def main(args):
     beta = args.beta
     i_plot = np.random.randint(0,rep) # Index of experiment to plot the figure
     verbose = args.verbose
-    
-    res_acc = np.zeros((rep,len(etas))) # Accuracy of clustering
-    res_mean_acc = np.zeros((rep,len(etas))) # Mean accuracy of clustering (per cluster)
-    # res_err = np.zeros((rep,len(qs),len(etas))) # Number of misclustered points
-    res_fail = np.zeros((rep,len(etas))) # Number of Failure
-    gammas = np.zeros(rep)
-    nus = np.zeros(rep)
-    rhos = np.zeros(rep)
 
-    c_dist = args.c_dist
-    assert (c_dist>0.5) & (c_dist<=1.0), "c_dist must be in (0.5,1]"
+    cs = [float(q) for q in args.cs.split(',')]
+    
+    res_acc = np.zeros((rep,len(cs),len(etas))) # Accuracy of clustering
+    res_mean_acc = np.zeros((rep,len(cs),len(etas))) # Mean accuracy of clustering (per cluster)
+    # res_err = np.zeros((rep,len(qs),len(etas))) # Number of misclustered points
+    res_fail = np.zeros((rep,len(cs),len(etas))) # Number of Failure
+    gammas = np.zeros(rep)
+    nus = np.zeros((rep,len(cs)))
+    rhos = np.zeros((rep,len(cs)))
 
     # Make directories to save results
     if not os.path.exists(base_dir):
@@ -62,99 +61,105 @@ def main(args):
         print "({}/{})... Synthetic data is generated: gamma={}, (n,m,k,std)=({},{},{},{})".format(
                 i_rep+1,rep,gamma,n,m,k,std)
 
-        nus[i_rep] = 1.0 + (gamma-1.0)*c_dist
-        rhos[i_rep] = c_dist
-
-        algo = weakSSAC(X,y_true,k,q=q,wtype=weak,ris=ris)
-        # Test SSAC algorithm for different q's and eta's (fix beta in this case)
+        algo = weakSSAC(X,y_true,k,wtype=weak,ris=ris)
+        # Test SSAC algorithm for different c's and eta's (fix beta in this case)
         # Calculate proper eta and beta based on parameters including delta
-        if verbose:
-            print "   - Proper eta={}, beta={} (delta={})".format(
-                    dataset.calc_eta(q,delta),dataset.calc_beta(q,delta),delta)
+        for i_c,c_dist in enumerate(cs):
+            assert (c_dist>0.5) & (c_dist<=1.0), "c_dist must be in (0.5,1]"
 
-        for i_eta,eta in enumerate(etas):
+            nus[i_rep,i_c] = float(gamma) / c_dist
+            rhos[i_rep,i_c] = c_dist
+
             if verbose:
-                print "     <Test: eta={}, beta={}>".format(eta,beta)
-            algo.set_params(eta,beta,rhos[i_rep],nus[i_rep])
+                print "   - Proper eta={}, beta={} (delta={})".format(
+                        dataset.calc_eta(delta,weak=weak,nu=nus[i_rep,i_c],rho=rhos[i_rep,i_c]),
+                        dataset.calc_beta(delta,weak=weak,nu=nus[i_rep,i_c],rho=rhos[i_rep,i_c]),
+                        delta)
 
-            if not algo.fit():
-                # Algorithm has failed
-                res_fail[i_rep,i_eta] = 1
-                i_plot = np.random.randint(i_rep+1,rep) # Index of experiment to plot the figure
-            
-            y_pred = algo.y
-            mpps = algo.mpps # Estimated cluster centers
-            # print "     ... Clustering is done. Number of binary search steps = {}\n".format(algo.bs_num)
-
-            # For evaluation & plotting, find best permutation of cluster assignment
-            y_pred_perm = find_permutation(dataset,algo)
-
-            # Calculate accuracy and mean accuracy
-            res_acc[i_rep,i_eta] = accuracy(y_true,y_pred_perm)
-            res_mean_acc[i_rep,i_eta] = mean_accuracy(y_true,y_pred_perm)
-
-            # # Calculate number of errors
-            # res_err[i_rep,i_eta] = error(y_true,y_pred_perm)
-
-            if args.isplot and (i_rep == i_plot) and (m<=2):
-                classes = range(k+1)
-                cmap = plt.cm.get_cmap("jet", k+1)
+            for i_eta,eta in enumerate(etas):
                 if verbose:
-                    print " ... Plotting"
-                f = plt.figure(figsize=(14,7))
-                plt.suptitle(r"SSAC with {} weak oracle ($q={},\eta={}, \beta={}$)".format(weak,q,eta,beta))
+                    print "     <Test: c_dist={}, eta={}, beta={}>".format(c_dist,eta,beta)
+                algo.set_params(eta,beta,rhos[i_rep],nus[i_rep,i_c])
 
-                # Plot original clustering (k-means)
-                plt.subplot(121)
-                for i in xrange(1,k+1):
-                    idx = y_true==i
-                    plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i])
-                # plt.scatter(X[:,0],X[:,1],c=y_true,label=classes)
-                plt.title("True dataset ($\gamma$={:.2f})".format(gamma))
-                plt.legend()
+                if not algo.fit():
+                    # Algorithm has failed
+                    res_fail[i_rep,i_c,i_eta] = 1
+                    i_plot = np.random.randint(i_rep+1,rep) # Index of experiment to plot the figure
+                
+                y_pred = algo.y
+                mpps = algo.mpps # Estimated cluster centers
+                # print "     ... Clustering is done. Number of binary search steps = {}\n".format(algo.bs_num)
 
-                # Plot SSAC result
-                plt.subplot(122)
-                for i in xrange(0,k+1):
-                    idx = np.array(y_pred_perm)==i
-                    if sum(idx)>0:
+                # For evaluation & plotting, find best permutation of cluster assignment
+                y_pred_perm = find_permutation(dataset,algo)
+
+                # Calculate accuracy and mean accuracy
+                res_acc[i_rep,i_c,i_eta] = accuracy(y_true,y_pred_perm)
+                res_mean_acc[i_rep,i_c,i_eta] = mean_accuracy(y_true,y_pred_perm)
+
+                # # Calculate number of errors
+                # res_err[i_rep,i_c,i_eta] = error(y_true,y_pred_perm)
+
+                if args.isplot and (i_rep == i_plot) and (m<=2):
+                    classes = range(k+1)
+                    cmap = plt.cm.get_cmap("jet", k+1)
+                    if verbose:
+                        print " ... Plotting"
+                    f = plt.figure(figsize=(14,7))
+                    plt.suptitle(r"SSAC with {} weak oracle ($\eta={}, \beta={}, \nu={}, \rho={}$)".format(
+                                weak,eta,beta,nus[i_rep,i_c],rhos[i_rep,i_c]))
+
+                    # Plot original clustering (k-means)
+                    plt.subplot(121)
+                    for i in xrange(1,k+1):
+                        idx = y_true==i
                         plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i])
-                # plt.scatter(X[:,0],X[:,1],c=y_pred_perm,label=classes)
-                plt.title("SSAC result ($\gamma$={:.2f})".format(gamma))
-                plt.legend()
+                    # plt.scatter(X[:,0],X[:,1],c=y_true,label=classes)
+                    plt.title("True dataset ($\gamma$={:.2f})".format(gamma))
+                    plt.legend()
 
-                # Plot estimated cluster centers
-                for t in xrange(k):
-                    mpp = mpps[t]
-                    plt.plot(mpp[0],mpp[1],'w^',ms=15)
+                    # Plot SSAC result
+                    plt.subplot(122)
+                    for i in xrange(0,k+1):
+                        idx = np.array(y_pred_perm)==i
+                        if sum(idx)>0:
+                            plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i])
+                    # plt.scatter(X[:,0],X[:,1],c=y_pred_perm,label=classes)
+                    plt.title("SSAC result ($\gamma$={:.2f})".format(gamma))
+                    plt.legend()
 
-                f.savefig(res_dir+'/fig_n{}_m{}_k{}_q{}_e{}.png'.format(n,m,k,q,eta),bbox_inches='tight')
-                plt.close()
+                    # Plot estimated cluster centers
+                    for t in xrange(k):
+                        mpp = mpps[t]
+                        plt.plot(mpp[0],mpp[1],'w^',ms=15)
+
+                    f.savefig(res_dir+'/fig_n{}_m{}_k{}_e{}.png'.format(n,m,k,eta),bbox_inches='tight')
+                    plt.close()
 
     # Write result as table
     fname = res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("acc",n,m,k)
     print_eval("Accuracy(%)",res_acc,etas,
-               res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("acc",n,m,k))
+               res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("acc",n,m,k),weak=weak,params=cs)
     print_eval("Mean Accuracy(%)",res_mean_acc,etas,
-               res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("meanacc",n,m,k))
+               res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("meanacc",n,m,k),weak=weak,params=cs)
     # print_eval("# Error(%)",res_err,qs,etas,
     #            res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("err",n,m,k))
     print_eval("# Failure",res_fail,etas,
                res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("fail",n,m,k),
-               True)
+               is_sum=True,weak=weak,params=cs)
 
     if args.isplot:
         # Plot Accuracy vs. eta
         fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("acc",n,m,k)
-        plot_eval("Accuracy(%)",res_acc,etas,fig_name)
+        plot_eval("Accuracy(%)",res_acc,etas,fig_name,weak=weak,params=cs)
 
         # Plot Mean Accuracy vs. eta
         fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("meanacc",n,m,k)
-        plot_eval("Mean Accuracy(%)",res_mean_acc,etas,fig_name)
+        plot_eval("Mean Accuracy(%)",res_mean_acc,etas,fig_name,weak=weak,params=cs)
 
         # Plot Failure vs. eta
         fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("fail",n,m,k)
-        plot_eval("# Failure",res_fail,etas,fig_name,is_sum=True)
+        plot_eval("# Failure",res_fail,etas,fig_name,is_sum=True,weak=weak,params=cs)
 
         # Plot histogram of gammas
         fig_name = res_dir+'/fig_gamma_hist.pdf'
@@ -198,9 +203,9 @@ def parse_args():
     parser.add_argument('-g_max', dest='max_gamma',
                         help='minimum gamma margin (default:1)',
                         default = 1.1, type = float)
-    parser.add_argument('-c_dist', dest='c_dist',
-                        help='fraction to set parameters for distance-weak oracle (0.5,1]',
-                        default = 0.8, type = float)
+    parser.add_argument('-cs', dest='cs',
+                        help='Fractions to set distance-weak parameters (0.5,1] ex) 0.7,0.85,1',
+                        default = '0.8,0.9,1', type = str)
     parser.add_argument('-isplot', dest='isplot',
                         help='plot the result: True/False',
                         default = True, type = str2bool)

@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 00:06:53
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-16 23:52:22
+# @Last Modified time: 2017-10-18 11:25:27
 
 import numpy as np
 from sklearn.datasets import make_blobs
@@ -35,20 +35,55 @@ class genData:
 
         self.X = X
         self.y = y
-        return X,y
+        self.X_means = X_means
+        return self.X,self.y,self.ris
 
-    def calc_eta(self,q,delta):
+    def calc_eta(self,delta,weak='random',q=1.0,nu=None,rho=None):
         assert (q >0) and (q<=1), "q must be in (0,1]"
-        if q < 1:
+        assert weak in ['random','local','global'], \
+                    "weak must be in ['random','local','global']"
+
+        if weak == 'random':
+            if q < 1:
+                return int(np.ceil(np.log(2.0*self.k*(self.m+1)/delta) / \
+                                   np.log(1.0/(1 - q**(self.k-1)*(1-np.exp(-(self.gamma-1)**2 /8.0))))
+                                   ))
+            else:
+                return int(np.ceil( 8*np.log(2*self.k*(self.m+1)/delta) / (self.gamma-1)**2 ))
+        elif weak == 'local':
+            c_param = min(2*rho-1,self.gamma-nu+1)
+            qds = []
+            for i in xrange(self.k):
+                dists = np.linalg.norm(
+                            self.X[self.y==i+1,:]-np.tile(self.X_means[i],(sum(self.y==i+1),1)),
+                            axis=1)
+                qds.append(sum(dists<c_param*self.ris[i])/float(len(dists)))
+
+            q = min(qds)
+            return int(np.ceil(np.log(2.0*self.k*(self.m+1)/delta) / \
+                               np.log(1.0/(1 - q**(self.k-1)*(1-np.exp(-(self.gamma-1)**2 /8.0))))
+                               ))
+        elif weak == 'global':
+            c_param = 2*rho-1
+            qds = []
+            for i in xrange(self.k):
+                dists = np.linalg.norm(
+                            self.X[self.y==i+1,:]-np.tile(self.X_means[i],(sum(self.y==i+1),1)),
+                            axis=1)
+                qds.append(sum(dists<c_param*self.ris[i])/float(len(dists)))
+
+            q = min(qds)
             return int(np.ceil(np.log(2.0*self.k*(self.m+1)/delta) / \
                                np.log(1.0/(1 - q**(self.k-1)*(1-np.exp(-(self.gamma-1)**2 /8.0))))
                                ))
         else:
             return int(np.ceil( 8*np.log(2*self.k*(self.m+1)/delta) / (self.gamma-1)**2 ))
     
-    def calc_beta(self,q,delta):
+    def calc_beta(self,delta,weak='random',q=1.0,nu=None,rho=None):
         assert (q >0) and (q<=1), "q must be in (0,1]"
-        if q < 1:
-            return int(np.ceil(np.log(2*self.k*np.log(self.n)/delta) / np.log(1.0/(1-q))))
-        else:
-            return 1
+        assert weak in ['random','local','global'], \
+                    "weak must be in ['random','local','global']"
+        if weak == 'random':
+            if q < 1:
+                return int(np.ceil(np.log(2*self.k*np.log(self.n)/delta) / np.log(1.0/(1-q))))
+        return 1

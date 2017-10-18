@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:19:24
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-17 02:45:35
+# @Last Modified time: 2017-10-18 12:54:17
 
 import numpy as np
 
@@ -19,9 +19,9 @@ class weakSSAC:
         self.wtype = wtype
         self.wtype_list = ["random","local","global"]
         self.ris = ris
-        self.centers = [np.mean(X[y_true==i],axis=0) for i in xrange(k)]
+        self.centers = [np.mean(X[self.y_true==i],axis=0) for i in xrange(1,k+1)]
 
-    def set_params(self,eta,beta,q=1,rho=rho,nu=nu):
+    def set_params(self,eta,beta,q=1,rho=0.8,nu=1.25):
         self.eta = eta
         self.beta = beta
         self.q = q
@@ -54,8 +54,16 @@ class weakSSAC:
             # 2) Cluster Assignment Query
             y_Z = self.clusterAssign(idx_Z)
             if sum(y_Z)==0:
-                print "    !!! Not-sure in Cluster Assignment. (q,eta,beta)=({},{},{}), i_k={}"\
-                       .format(self.q,self.eta,self.beta,i_k)    
+                if self.wtype == 'random':
+                    print "    !!! Not-sure in Cluster Assignment. (q,eta,beta)=({},{},{}), i_k={}"\
+                           .format(self.q,self.eta,self.beta,i_k)
+                elif self.wtype == 'local':
+                    print "    !!! Not-sure in Cluster Assignment. (nu,rho,eta,beta)=({},{},{},{}), i_k={}"\
+                        .format(self.nu,self.rho,self.eta,self.beta,i_k)
+                elif self.wtype == 'global':
+                    print "    !!! Not-sure in Cluster Assignment. (rho,eta,beta)=({},{},{}), i_k={}"\
+                        .format(self.rho,self.eta,self.beta,i_k)
+
             else:
                 # Find a cluster with maximum number of samples
                 p = self.clusters[np.argmax([y_Z.count(t) for t in self.clusters])]
@@ -63,8 +71,16 @@ class weakSSAC:
                 mpp = np.mean(self.X[idx_p,:],axis=0)
                 # print "Size of Z_p: {}".format(len(idx_p))
                 if p in self.labels:
-                    print "    !!! Cluster p revisited (q,eta,beta)=({},{},{}), i_k={}".format(
+                    if self.wtype == 'random':
+                        print "    !!! Cluster p revisited (q,eta,beta)=({},{},{}), i_k={}".format(
                                   self.q,self.eta,self.beta,i_k)
+                    elif self.wtype == 'local':
+                        print "    !!! Cluster p revisited (nu,rho,eta,beta)=({},{},{},{}), i_k={}".format(
+                                  self.nu,self.rho,self.eta,self.beta,i_k)
+                    elif self.wtype == 'global':
+                        print "    !!! Cluster p revisited (rho,eta,beta)=({},{},{}), i_k={}".format(
+                                  self.rho,self.eta,self.beta,i_k)
+
                     self.mpps[self.labels.index(p)] = mpp # Update mean
                 else:
                     self.mpps.append(mpp) # Estimated cluster center
@@ -107,8 +123,15 @@ class weakSSAC:
 
         # Some Failure cases
         if len(self.labels) < self.k: # Number of recovered clusters are less than k
-            print "    !!! Number of assigned clusters={} is less than k={}. (q,eta,beta)=({},{},{})"\
-                  .format(len(self.labels),self.k,self.q,self.eta,self.beta)
+            if self.wtype == 'random':
+                print "    !!! Number of assigned clusters={} is less than k={}. (q,eta,beta)=({},{},{})"\
+                      .format(len(self.labels),self.k,self.q,self.eta,self.beta)
+            elif self.wtype == 'local':
+                print "    !!! Number of assigned clusters={} is less than k={}. (nu,rho,eta,beta)=({},{},{})"\
+                      .format(len(self.labels),self.k,self.nu,self.rho,self.eta,self.beta)
+            elif self.wtype == 'global':
+                print "    !!! Number of assigned clusters={} is less than k={}. (rho,eta,beta)=({},{})"\
+                      .format(len(self.labels),self.k,self.rho,self.eta,self.beta)
             return False
         else:
             return True
@@ -122,26 +145,26 @@ class weakSSAC:
             return np.random.binomial(1,self.q)*\
                    2*(int(self.y_true[idx_x]==self.y_true[idx_y])-0.5)
         elif self.wtype == "local":
-            d_xy = np.linalg.norm(self.X[idx_x]-self.X[idx_y])
-            if y_true[idx_x]==y_true[idx_y]:
-                d_xi = np.linalg.norm(self.X[idx_x]-self.centers[y_true[idx_x]])
-                d_yi = np.linalg.norm(self.X[idx_y]-self.centers[y_true[idx_y]])
+            d_xy = np.linalg.norm(self.X[idx_x,:]-self.X[idx_y,:])
+            if self.y_true[idx_x] == self.y_true[idx_y]:
+                d_xi = np.linalg.norm(self.X[idx_x,:]-self.centers[self.y_true[idx_x]-1])
+                d_yi = np.linalg.norm(self.X[idx_y,:]-self.centers[self.y_true[idx_y]-1])
                 if (self.nu-1)*min(d_xi,d_yi)>d_xy:
                     return 0
             else:
-                if d_xy > 2*self.rho*self.ris[y_true[idx_x]]:
+                if d_xy > 2*self.rho*self.ris[self.y_true[idx_x]-1]:
                     return 0
             return 2*(int(self.y_true[idx_x]==self.y_true[idx_y])-0.5)
         elif self.wtype == "global":
-            d_xy = np.linalg.norm(self.X[idx_x]-self.X[idx_y])
-            if y_true[idx_x]==y_true[idx_y]:
-                d_xi = np.linalg.norm(self.X[idx_x]-self.centers[y_true[idx_x]])
-                d_yi = np.linalg.norm(self.X[idx_y]-self.centers[y_true[idx_y]])
-                if (self.rho*self.ris[y_true[idx_x]]<d_xi) | \
-                   (self.rho*self.ris[y_true[idx_y]]<d_yi):
+            d_xy = np.linalg.norm(self.X[idx_x,:]-self.X[idx_y,:])
+            if self.y_true[idx_x] == self.y_true[idx_y]:
+                d_xi = np.linalg.norm(self.X[idx_x,:]-self.centers[self.y_true[idx_x]-1])
+                d_yi = np.linalg.norm(self.X[idx_y,:]-self.centers[self.y_true[idx_y]-1])
+                if (self.rho*self.ris[self.y_true[idx_x]-1]<d_xi) | \
+                   (self.rho*self.ris[self.y_true[idx_y]-1]<d_yi):
                     return 0
             else:
-                if d_xy > 2*self.rho*self.ris[y_true[idx_x]]:
+                if d_xy > 2*self.rho*self.ris[self.y_true[idx_x]-1]:
                     return 0
             return 2*(int(self.y_true[idx_x]==self.y_true[idx_y])-0.5)
         else:

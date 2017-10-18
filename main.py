@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-17 01:42:26
+# @Last Modified time: 2017-10-18 11:54:11
 
 import numpy as np
 import time
@@ -63,7 +63,9 @@ def main(args):
             # Calculate proper eta and beta based on parameters including delta
             if verbose:
                 print "   - Proper eta={}, beta={} (delta={})".format(
-                        dataset.calc_eta(q,delta),dataset.calc_beta(q,delta),delta)
+                        dataset.calc_eta(delta,weak=weak,q=q),
+                        dataset.calc_beta(delta,weak=weak,q=q)
+                        ,delta)
     
             for i_eta,eta in enumerate(etas):
                 if verbose:
@@ -127,27 +129,27 @@ def main(args):
     # Write result as table
     fname = res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("acc",n,m,k)
     print_eval("Accuracy(%)",res_acc,etas,
-               res_dir+'/res_{}_{}_n{}_m{}_k{}.csv'.format(weak,"acc",n,m,k),qs=qs)
+               res_dir+'/res_{}_{}_n{}_m{}_k{}.csv'.format(weak,"acc",n,m,k),weak=weak,params=qs)
     print_eval("Mean Accuracy(%)",res_mean_acc,etas,
-               res_dir+'/res_{}_{}_n{}_m{}_k{}.csv'.format(weak,"meanacc",n,m,k),qs=qs)
+               res_dir+'/res_{}_{}_n{}_m{}_k{}.csv'.format(weak,"meanacc",n,m,k),weak=weak,params=qs)
     # print_eval("# Error(%)",res_err,qs,etas,
     #            res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("err",n,m,k))
     print_eval("# Failure",res_fail,etas,
                res_dir+'/res_{}_{}_n{}_m{}_k{}.csv'.format(weak,"fail",n,m,k),
-               is_sum=True,qs=qs)
+               is_sum=True,weak=weak,params=qs)
 
     if args.isplot:
         # Plot Accuracy vs. eta
         fig_name = res_dir+'/fig_{}_{}_n{}_m{}_k{}.pdf'.format(weak,"acc",n,m,k)
-        plot_eval("Accuracy(%)",res_acc,etas,fig_name,qs=qs)
+        plot_eval("Accuracy(%)",res_acc,etas,fig_name,weak=weak,params=qs)
 
         # Plot Mean Accuracy vs. eta
         fig_name = res_dir+'/fig_{}_{}_n{}_m{}_k{}.pdf'.format(weak,"meanacc",n,m,k)
-        plot_eval("Mean Accuracy(%)",res_mean_acc,etas,fig_name,qs=qs)
+        plot_eval("Mean Accuracy(%)",res_mean_acc,etas,fig_name,weak=weak,params=qs)
 
         # Plot Failure vs. eta
         fig_name = res_dir+'/fig_{}_{}_n{}_m{}_k{}.pdf'.format(weak,"fail",n,m,k)
-        plot_eval("# Failure",res_fail,etas,fig_name,is_sum=True,qs=qs)
+        plot_eval("# Failure",res_fail,etas,fig_name,is_sum=True,weak=weak,params=qs)
 
         # Plot histogram of gammas
         fig_name = res_dir+'/fig_gamma_hist.pdf'
