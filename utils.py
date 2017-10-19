@@ -2,13 +2,13 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-19 11:33:49
+# @Last Modified time: 2017-10-19 11:34:31
 
 import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
 import matplotlib
 matplotlib.use('agg')
+import matplotlib.pyplot as plt
+import pandas as pd
 
 def accuracy(y_true,y_pred):
     return 100*np.sum(y_true==y_pred)/float(len(y_true))
