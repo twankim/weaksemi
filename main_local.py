@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-19 09:05:18
+# @Last Modified time: 2017-10-19 09:07:17
 
 import numpy as np
 import time
@@ -209,7 +209,7 @@ def parse_args():
                         default = '0.7,0.85,1', type = str)
     parser.add_argument('-isplot', dest='isplot',
                         help='plot the result: True/False',
-                        default = True, type = str2bool)
+                        default = False, type = str2bool)
     parser.add_argument('-verbose', dest='verbose',
                         help='verbose: True/False',
                         default = False, type = str2bool)

@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-18 23:36:38
+# @Last Modified time: 2017-10-19 09:08:54
 
 import numpy as np
 import time
@@ -91,7 +91,7 @@ def main(args):
                 # # Calculate number of errors
                 # res_err[i_rep,i_q,i_eta] = error(y_true,y_pred_perm)
     
-                if args.isplot and (i_rep == i_plot) and (m<=2):
+                if (i_rep == i_plot) and (m<=2):
                     classes = range(k+1)
                     cmap = plt.cm.get_cmap("jet", k+1)
                     if verbose:
@@ -138,23 +138,23 @@ def main(args):
                res_dir+'/res_{}_{}_n{}_m{}_k{}.csv'.format(weak,"fail",n,m,k),
                is_sum=True,weak=weak,params=qs)
 
+    # Plot Accuracy vs. eta
+    fig_name = res_dir+'/fig_{}_{}_n{}_m{}_k{}.pdf'.format(weak,"acc",n,m,k)
+    plot_eval("Accuracy(%)",res_acc,etas,fig_name,weak=weak,params=qs)
+
+    # Plot Mean Accuracy vs. eta
+    fig_name = res_dir+'/fig_{}_{}_n{}_m{}_k{}.pdf'.format(weak,"meanacc",n,m,k)
+    plot_eval("Mean Accuracy(%)",res_mean_acc,etas,fig_name,weak=weak,params=qs)
+
+    # Plot Failure vs. eta
+    fig_name = res_dir+'/fig_{}_{}_n{}_m{}_k{}.pdf'.format(weak,"fail",n,m,k)
+    plot_eval("# Failure",res_fail,etas,fig_name,is_sum=True,weak=weak,params=qs)
+
+    # Plot histogram of gammas
+    fig_name = res_dir+'/fig_gamma_hist.pdf'
+    plot_hist(gammas,args.min_gamma,args.max_gamma,fig_name)
+
     if args.isplot:
-        # Plot Accuracy vs. eta
-        fig_name = res_dir+'/fig_{}_{}_n{}_m{}_k{}.pdf'.format(weak,"acc",n,m,k)
-        plot_eval("Accuracy(%)",res_acc,etas,fig_name,weak=weak,params=qs)
-
-        # Plot Mean Accuracy vs. eta
-        fig_name = res_dir+'/fig_{}_{}_n{}_m{}_k{}.pdf'.format(weak,"meanacc",n,m,k)
-        plot_eval("Mean Accuracy(%)",res_mean_acc,etas,fig_name,weak=weak,params=qs)
-
-        # Plot Failure vs. eta
-        fig_name = res_dir+'/fig_{}_{}_n{}_m{}_k{}.pdf'.format(weak,"fail",n,m,k)
-        plot_eval("# Failure",res_fail,etas,fig_name,is_sum=True,weak=weak,params=qs)
-
-        # Plot histogram of gammas
-        fig_name = res_dir+'/fig_gamma_hist.pdf'
-        plot_hist(gammas,args.min_gamma,args.max_gamma,fig_name)
-
         plt.show()
     
 def parse_args():
@@ -193,9 +193,12 @@ def parse_args():
     parser.add_argument('-g_max', dest='max_gamma',
                         help='minimum gamma margin (default:1)',
                         default = 1.1, type = float)
+    parser.add_argument('-cs', dest='cs',
+                        help='Fractions to set distance-weak parameters (0.5,1] ex) 0.7,0.85,1',
+                        default = '0.7,0.85,1', type = str)
     parser.add_argument('-isplot', dest='isplot',
                         help='plot the result: True/False',
-                        default = True, type = str2bool)
+                        default = False, type = str2bool)
     parser.add_argument('-verbose', dest='verbose',
                         help='verbose: True/False',
                         default = False, type = str2bool)
