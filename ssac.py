@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:19:24
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-18 20:49:47
+# @Last Modified time: 2017-10-18 23:42:43
 
 import numpy as np
 
@@ -165,8 +165,6 @@ class weakSSAC:
                 d_yi = np.linalg.norm(self.X[idx_y,:]-self.centers[self.y_true[idx_y]-1])
                 if (d_xi > self.rho*self.ris[self.y_true[idx_x]-1]) | \
                    (d_yi > self.rho*self.ris[self.y_true[idx_y]-1]):
-                    print 'd_xi:{}, d_yi:{}, rho:{},rx:{},ry:{}'.format(
-                        d_xi,d_yi,self.rho,self.ris[self.y_true[idx_x]-1],self.ris[self.y_true[idx_y]-1])
                     return 0
             return 2*(int(self.y_true[idx_x]==self.y_true[idx_y])-0.5)
         else:
