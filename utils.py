@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-18 13:03:02
+# @Last Modified time: 2017-10-19 08:51:44
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -68,8 +68,10 @@ def print_eval(eval_metric,res,etas,fname,is_sum=False,weak='random',params=None
                     "weak must be in ['random','local','global']"
     if weak == 'random':
         i_name = 'q'
+        t_name = weak
     else:
         i_name = 'c_{dist}'
+        t_name = weak +' distance'
 
     rep = res.shape[0]
     if not is_sum:
@@ -79,8 +81,8 @@ def print_eval(eval_metric,res,etas,fname,is_sum=False,weak='random',params=None
                               )
         df_res.index.name=i_name
         df_res.columns.name='eta'
-        print "\n<{} of SSAC (Averaged over {} experiments)>".format(
-                eval_metric,rep)
+        print "\n<{}. {}-weak (Averaged over {} experiments)>".format(
+                eval_metric,t_name, rep)
     else:
         df_res = pd.DataFrame(res.sum(axis=0),
                               columns=etas,
@@ -88,8 +90,8 @@ def print_eval(eval_metric,res,etas,fname,is_sum=False,weak='random',params=None
                               )
         df_res.index.name=i_name
         df_res.columns.name='eta'
-        print "\n<{} of SSAC (Total Sum over {} experiments)>".format(
-                eval_metric,rep)
+        print "\n<{}. {}-weak (Total Sum over {} experiments)>".format(
+                eval_metric,t_name,rep)
     print df_res
     df_res.to_csv(fname)
 
@@ -100,20 +102,24 @@ def plot_eval(eval_metric,res,etas,fig_name,is_sum=False,weak='random',params=No
                     "weak must be in ['random','local','global']"
     if weak == 'random':
         i_name = 'q'
+        t_name = weak
     else:
         i_name = 'c_dist'
+        t_name = weak + ' distance'
 
     rep = res.shape[0]
     if not is_sum:
         f = plt.figure()
-        plt.title(r"{} of SSAC (Averaged over {} experiments)".format(eval_metric,rep))
+        plt.title(r"{}. {}-weak (Averaged over {} experiments)".format(
+                            eval_metric,t_name,rep))
         for i_p,param in enumerate(params):
             plt.plot(etas,res.mean(axis=0)[i_p,:],'x-',label=r'${}={}$'.format(i_name,param))
             plt.xlabel(r"$\eta$ (Number of samples per cluster)")
         plt.ylabel(eval_metric)
     else:
         f = plt.figure()
-        plt.title(r"{} of SSAC (Total sum over {} experiments)".format(eval_metric,rep))
+        plt.title(r"{}. {}-weak (Total sum over {} experiments)".format(
+                            eval_metric,t_name,rep))
         for i_p,param in enumerate(params):
             plt.plot(etas,res.sum(axis=0)[i_p,:],'x-',label=r'${}={}$'.format(i_name,param))
             plt.xlabel(r"$\eta$ (Number of samples per cluster)")

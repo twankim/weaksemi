@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-18 23:41:29
+# @Last Modified time: 2017-10-19 08:45:51
 
 import numpy as np
 import time
@@ -181,7 +181,7 @@ def parse_args():
                         default = 3, type = int)
     parser.add_argument('-n', dest='n',
                         help='Number of data points in synthetic data',
-                        default = 1500, type = int)
+                        default = 600, type = int)
     parser.add_argument('-m', dest='m',
                         help='Dimension of data points in synthetic data',
                         default = 2, type = int)
