@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-18 23:41:29
+# @Last Modified time: 2017-10-18 23:41:35
 
 import numpy as np
 import time
@@ -15,7 +15,7 @@ from ssac import weakSSAC
 from gen_data import genData
 from utils import *
 
-weak = "local"
+weak = "global"
 delta = 0.99
 base_dir= os.path.join('./results',weak)
 
@@ -38,7 +38,6 @@ def main(args):
     # res_err = np.zeros((rep,len(qs),len(etas))) # Number of misclustered points
     res_fail = np.zeros((rep,len(cs),len(etas))) # Number of Failure
     gammas = np.zeros(rep)
-    nus = np.zeros((rep,len(cs)))
     rhos = np.zeros((rep,len(cs)))
 
     # Make directories to save results
@@ -67,19 +66,18 @@ def main(args):
         for i_c,c_dist in enumerate(cs):
             assert (c_dist>0.5) & (c_dist<=1.0), "c_dist must be in (0.5,1]"
 
-            nus[i_rep,i_c] = float(gamma) / c_dist
             rhos[i_rep,i_c] = c_dist
 
             if verbose:
                 print "   - Proper eta={}, beta={} (delta={})".format(
-                        dataset.calc_eta(delta,weak=weak,nu=nus[i_rep,i_c],rho=rhos[i_rep,i_c]),
-                        dataset.calc_beta(delta,weak=weak,nu=nus[i_rep,i_c],rho=rhos[i_rep,i_c]),
+                        dataset.calc_eta(delta,weak=weak,rho=rhos[i_rep,i_c]),
+                        dataset.calc_beta(delta,weak=weak,rho=rhos[i_rep,i_c]),
                         delta)
 
             for i_eta,eta in enumerate(etas):
                 if verbose:
                     print "     <Test: c_dist={}, eta={}, beta={}>".format(c_dist,eta,beta)
-                algo.set_params(eta,beta,rho=rhos[i_rep,i_c],nu=nus[i_rep,i_c])
+                algo.set_params(eta,beta,rho=rhos[i_rep,i_c])
 
                 if not algo.fit():
                     # Algorithm has failed
@@ -106,8 +104,8 @@ def main(args):
                     if verbose:
                         print " ... Plotting"
                     f = plt.figure(figsize=(14,7))
-                    plt.suptitle(r"SSAC with {} weak oracle ($\eta={}, \beta={}, \nu={}, \rho={}$)".format(
-                                weak,eta,beta,nus[i_rep,i_c],rhos[i_rep,i_c]))
+                    plt.suptitle(r"SSAC with {} weak oracle ($\eta={}, \beta={}, \rho={}$)".format(
+                                weak,eta,beta,rhos[i_rep,i_c]))
 
                     # Plot original clustering (k-means)
                     plt.subplot(121)

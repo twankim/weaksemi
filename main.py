@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-18 11:54:11
+# @Last Modified time: 2017-10-18 23:36:38
 
 import numpy as np
 import time
@@ -17,7 +17,7 @@ from utils import *
 
 weak = "random"
 delta = 0.99
-base_dir='./results'
+base_dir= os.path.join('./results',weak)
 
 def main(args):
     rep = args.rep
@@ -70,7 +70,7 @@ def main(args):
             for i_eta,eta in enumerate(etas):
                 if verbose:
                     print "     <Test: q={}, eta={}, beta={}>".format(q,eta,beta)
-                algo.set_params(eta,beta,q)
+                algo.set_params(eta,beta,q=q)
 
                 if not algo.fit():
                     # Algorithm has failed
