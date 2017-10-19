@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-19 09:08:54
+# @Last Modified time: 2017-10-19 18:24:06
 
 import numpy as np
 import time
@@ -92,39 +92,10 @@ def main(args):
                 # res_err[i_rep,i_q,i_eta] = error(y_true,y_pred_perm)
     
                 if (i_rep == i_plot) and (m<=2):
-                    classes = range(k+1)
-                    cmap = plt.cm.get_cmap("jet", k+1)
-                    if verbose:
-                        print " ... Plotting"
-                    f = plt.figure(figsize=(14,7))
-                    plt.suptitle(r"SSAC with {} weak oracle ($q={},\eta={}, \beta={}$)".format(weak,q,eta,beta))
-    
-                    # Plot original clustering (k-means)
-                    plt.subplot(121)
-                    for i in xrange(1,k+1):
-                        idx = y_true==i
-                        plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i])
-                    # plt.scatter(X[:,0],X[:,1],c=y_true,label=classes)
-                    plt.title("True dataset ($\gamma$={:.2f})".format(gamma))
-                    plt.legend()
-    
-                    # Plot SSAC result
-                    plt.subplot(122)
-                    for i in xrange(0,k+1):
-                        idx = np.array(y_pred_perm)==i
-                        if sum(idx)>0:
-                            plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i])
-                    # plt.scatter(X[:,0],X[:,1],c=y_pred_perm,label=classes)
-                    plt.title("SSAC result ($\gamma$={:.2f})".format(gamma))
-                    plt.legend()
-    
-                    # Plot estimated cluster centers
-                    for t in xrange(k):
-                        mpp = mpps[t]
-                        plt.plot(mpp[0],mpp[1],'w^',ms=15)
-
-                    f.savefig(res_dir+'/fig_n{}_m{}_k{}_q{}_e{}.png'.format(n,m,k,q,eta),bbox_inches='tight')
-                    plt.close()
+                    title = r"SSAC with {} weak oracle ($q={},\eta={}, \beta={}$)".format(weak,q,eta,beta)
+                    f_name = res_dir+'/fig_n{}_m{}_k{}_e{}.png'.format(n,m,k,eta)
+                    plot_cluster(X,y_true,y_pred_perm,k,mpps,gamma,
+                                 title,f_name,verbose)
 
     # Write result as table
     fname = res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("acc",n,m,k)

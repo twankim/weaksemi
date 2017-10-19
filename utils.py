@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-19 17:23:04
+# @Last Modified time: 2017-10-19 18:21:09
 
 import numpy as np
 import matplotlib
@@ -72,7 +72,7 @@ def print_eval(eval_metric,res,etas,fname,is_sum=False,weak='random',params=None
         i_name = 'q'
         t_name = weak
     else:
-        i_name = 'c_{dist}'
+        i_name = 'c_dist'
         t_name = weak +' distance'
 
     rep = res.shape[0]
@@ -106,7 +106,7 @@ def plot_eval(eval_metric,res,etas,fig_name,is_sum=False,weak='random',params=No
         i_name = 'q'
         t_name = weak
     else:
-        i_name = 'c_dist'
+        i_name = 'c_{dist}'
         t_name = weak + ' distance'
 
     rep = res.shape[0]

@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-19 17:23:11
+# @Last Modified time: 2017-10-19 18:21:39
 
 import numpy as np
 import time
@@ -103,7 +103,7 @@ def main(args):
                 # res_err[i_rep,i_c,i_eta] = error(y_true,y_pred_perm)
 
                 if (i_rep == i_plot) and (m<=2):
-                    title = r"SSAC with {} weak oracle ($\eta={}, \beta={}, \nu={}, \rho={}$)".format(
+                    title = r"SSAC with {} weak oracle ($\eta={}, \beta={}, \nu={:.2f}, \rho={:.2f}$)".format(
                                 weak,eta,beta,nus[i_rep,i_c],rhos[i_rep,i_c])
                     f_name = res_dir+'/fig_n{}_m{}_k{}_e{}.png'.format(n,m,k,eta)
                     plot_cluster(X,y_true,y_pred_perm,k,mpps,gamma,
