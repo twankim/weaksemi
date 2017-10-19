@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-19 09:02:31
+# @Last Modified time: 2017-10-19 09:05:18
 
 import numpy as np
 import time
@@ -100,7 +100,7 @@ def main(args):
                 # # Calculate number of errors
                 # res_err[i_rep,i_c,i_eta] = error(y_true,y_pred_perm)
 
-                if args.isplot and (i_rep == i_plot) and (m<=2):
+                if (i_rep == i_plot) and (m<=2):
                     classes = range(k+1)
                     cmap = plt.cm.get_cmap("jet", k+1)
                     if verbose:
@@ -148,23 +148,24 @@ def main(args):
                res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("fail",n,m,k),
                is_sum=True,weak=weak,params=cs)
 
+    # if args.isplot:
+    # Plot Accuracy vs. eta
+    fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("acc",n,m,k)
+    plot_eval("Accuracy(%)",res_acc,etas,fig_name,weak=weak,params=cs)
+
+    # Plot Mean Accuracy vs. eta
+    fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("meanacc",n,m,k)
+    plot_eval("Mean Accuracy(%)",res_mean_acc,etas,fig_name,weak=weak,params=cs)
+
+    # Plot Failure vs. eta
+    fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("fail",n,m,k)
+    plot_eval("# Failure",res_fail,etas,fig_name,is_sum=True,weak=weak,params=cs)
+
+    # Plot histogram of gammas
+    fig_name = res_dir+'/fig_gamma_hist.pdf'
+    plot_hist(gammas,args.min_gamma,args.max_gamma,fig_name)
+
     if args.isplot:
-        # Plot Accuracy vs. eta
-        fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("acc",n,m,k)
-        plot_eval("Accuracy(%)",res_acc,etas,fig_name,weak=weak,params=cs)
-
-        # Plot Mean Accuracy vs. eta
-        fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("meanacc",n,m,k)
-        plot_eval("Mean Accuracy(%)",res_mean_acc,etas,fig_name,weak=weak,params=cs)
-
-        # Plot Failure vs. eta
-        fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("fail",n,m,k)
-        plot_eval("# Failure",res_fail,etas,fig_name,is_sum=True,weak=weak,params=cs)
-
-        # Plot histogram of gammas
-        fig_name = res_dir+'/fig_gamma_hist.pdf'
-        plot_hist(gammas,args.min_gamma,args.max_gamma,fig_name)
-
         plt.show()
     
 def parse_args():
