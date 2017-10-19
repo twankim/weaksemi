@@ -2,14 +2,17 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-19 09:08:25
+# @Last Modified time: 2017-10-19 13:59:41
 
 import numpy as np
 import time
 import sys
 import os
 import argparse
+import matplotlib
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
+
 
 from ssac import weakSSAC
 from gen_data import genData
