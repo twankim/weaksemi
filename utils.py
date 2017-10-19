@@ -2,11 +2,11 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-19 11:34:31
+# @Last Modified time: 2017-10-19 17:23:04
 
 import numpy as np
 import matplotlib
-matplotlib.use('agg')
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd
 
