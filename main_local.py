@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-19 09:07:17
+# @Last Modified time: 2017-10-19 11:33:54
 
 import numpy as np
 import time
@@ -10,6 +10,8 @@ import sys
 import os
 import argparse
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('agg')
 
 from ssac import weakSSAC
 from gen_data import genData
@@ -101,40 +103,11 @@ def main(args):
                 # res_err[i_rep,i_c,i_eta] = error(y_true,y_pred_perm)
 
                 if (i_rep == i_plot) and (m<=2):
-                    classes = range(k+1)
-                    cmap = plt.cm.get_cmap("jet", k+1)
-                    if verbose:
-                        print " ... Plotting"
-                    f = plt.figure(figsize=(14,7))
-                    plt.suptitle(r"SSAC with {} weak oracle ($\eta={}, \beta={}, \nu={}, \rho={}$)".format(
-                                weak,eta,beta,nus[i_rep,i_c],rhos[i_rep,i_c]))
-
-                    # Plot original clustering (k-means)
-                    plt.subplot(121)
-                    for i in xrange(1,k+1):
-                        idx = y_true==i
-                        plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i])
-                    # plt.scatter(X[:,0],X[:,1],c=y_true,label=classes)
-                    plt.title("True dataset ($\gamma$={:.2f})".format(gamma))
-                    plt.legend()
-
-                    # Plot SSAC result
-                    plt.subplot(122)
-                    for i in xrange(0,k+1):
-                        idx = np.array(y_pred_perm)==i
-                        if sum(idx)>0:
-                            plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i])
-                    # plt.scatter(X[:,0],X[:,1],c=y_pred_perm,label=classes)
-                    plt.title("SSAC result ($\gamma$={:.2f})".format(gamma))
-                    plt.legend()
-
-                    # Plot estimated cluster centers
-                    for t in xrange(k):
-                        mpp = mpps[t]
-                        plt.plot(mpp[0],mpp[1],'w^',ms=15)
-
-                    f.savefig(res_dir+'/fig_n{}_m{}_k{}_e{}.png'.format(n,m,k,eta),bbox_inches='tight')
-                    plt.close()
+                    title = r"SSAC with {} weak oracle ($\eta={}, \beta={}, \nu={}, \rho={}$)".format(
+                                weak,eta,beta,nus[i_rep,i_c],rhos[i_rep,i_c])
+                    f_name = res_dir+'/fig_n{}_m{}_k{}_e{}.png'.format(n,m,k,eta)
+                    plot_cluster(X,y_true,y_pred_perm,k,mpps,gamma,
+                                 title,f_name,verbose)
 
     # Write result as table
     fname = res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("acc",n,m,k)
@@ -188,7 +161,7 @@ def parse_args():
                         default = 2, type = int)
     parser.add_argument('-std', dest='std',
                         help='standard deviation of Gaussian distribution (default:1.5)',
-                        default = 1.75, type = float)
+                        default = 2.0, type = float)
     parser.add_argument('-qs', dest='qs',
                         help='Probabilities q (not-sure with 1-q) ex) 0.7,0.85,1',
                         default = '0.7,0.85,1', type = str)

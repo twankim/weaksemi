@@ -2,11 +2,13 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-19 08:51:44
+# @Last Modified time: 2017-10-19 11:33:49
 
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib
+matplotlib.use('agg')
 
 def accuracy(y_true,y_pred):
     return 100*np.sum(y_true==y_pred)/float(len(y_true))
@@ -147,3 +149,38 @@ def plot_hist(gammas,min_gamma,max_gamma,fig_name):
     plt.ylabel("Number of data generations")
 
     f.savefig(fig_name,bbox_inches='tight')
+
+def plot_cluster(X,y_true,y_pred,k,mpps,gamma,title,f_name,verbose):
+    classes = range(k+1)
+    cmap = plt.cm.get_cmap("jet", k+1)
+    if verbose:
+        print " ... Plotting"
+    f = plt.figure(figsize=(14,7))
+    plt.suptitle(title)
+
+    # Plot original clustering (k-means)
+    plt.subplot(121)
+    for i in xrange(1,k+1):
+        idx = y_true==i
+        plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i])
+    # plt.scatter(X[:,0],X[:,1],c=y_true,label=classes)
+    plt.title("True dataset ($\gamma$={:.2f})".format(gamma))
+    plt.legend()
+
+    # Plot SSAC result
+    plt.subplot(122)
+    for i in xrange(0,k+1):
+        idx = np.array(y_pred)==i
+        if sum(idx)>0:
+            plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i])
+    # plt.scatter(X[:,0],X[:,1],c=y_pred,label=classes)
+    plt.title("SSAC result ($\gamma$={:.2f})".format(gamma))
+    plt.legend()
+
+    # Plot estimated cluster centers
+    for t in xrange(k):
+        mpp = mpps[t]
+        plt.plot(mpp[0],mpp[1],'w^',ms=15)
+
+    f.savefig(f_name,bbox_inches='tight')
+    plt.close()
