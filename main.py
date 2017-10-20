@@ -2,13 +2,15 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-20 14:54:45
+# @Last Modified time: 2017-10-20 14:55:34
 
 import numpy as np
 import time
 import sys
 import os
 import argparse
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from ssac import weakSSAC
