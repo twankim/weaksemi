@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-19 18:21:39
+# @Last Modified time: 2017-10-19 23:41:32
 
 import numpy as np
 import time
@@ -179,7 +179,7 @@ def parse_args():
                         default = 1.1, type = float)
     parser.add_argument('-cs', dest='cs',
                         help='Fractions to set distance-weak parameters (0.5,1] ex) 0.7,0.85,1',
-                        default = '0.7,0.85,1', type = str)
+                        default = '0.6,0.8,1', type = str)
     parser.add_argument('-isplot', dest='isplot',
                         help='plot the result: True/False',
                         default = False, type = str2bool)
