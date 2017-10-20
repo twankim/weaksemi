@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 00:06:53
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-18 11:25:27
+# @Last Modified time: 2017-10-19 23:50:33
 
 import numpy as np
 from sklearn.datasets import make_blobs
