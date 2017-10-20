@@ -2,11 +2,12 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:19:24
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-20 14:31:49
+# @Last Modified time: 2017-10-20 14:32:03
 
 import numpy as np
 
-class weakSSAC:
+# Original SSAC without not-sure answer
+class SSAC:
     def __init__(self,X,y_true,k,q=1,wtype="random",ris=None):
         self.X = X
         self.n, self.m = np.shape(X)
@@ -136,40 +137,41 @@ class weakSSAC:
         else:
             return True
 
-    # Weak Same Cluster Query
     def weakQuery(self,idx_x,idx_y):
         # 1: same cluster
-        # 0: not-sure
         # -1: different cluster
+        # If not-sure, return a random answer
         if self.wtype == "random":
-            return np.random.binomial(1,self.q)*\
-                   2*(int(self.y_true[idx_x]==self.y_true[idx_y])-0.5)
+            if np.random.binomial(1,self.q) == 1:
+                return 2*(int(self.y_true[idx_x]==self.y_true[idx_y])-0.5)
+            else:
+                return 2*(np.random.binomial(1,0.5)-0.5)
         elif self.wtype == "local":
             d_xy = np.linalg.norm(self.X[idx_x,:]-self.X[idx_y,:])
             if self.y_true[idx_x] == self.y_true[idx_y]:
                 if d_xy > 2*self.rho*self.ris[self.y_true[idx_x]-1]:
-                    return 0
+                    return 2*(np.random.binomial(1,0.5)-0.5)
             else:
                 d_xi = np.linalg.norm(self.X[idx_x,:]-self.centers[self.y_true[idx_x]-1])
                 d_yi = np.linalg.norm(self.X[idx_y,:]-self.centers[self.y_true[idx_y]-1])
                 if (self.nu-1)*min(d_xi,d_yi)>d_xy:
-                    return 0
+                    return 2*(np.random.binomial(1,0.5)-0.5)
             return 2*(int(self.y_true[idx_x]==self.y_true[idx_y])-0.5)
         elif self.wtype == "global":
             d_xy = np.linalg.norm(self.X[idx_x,:]-self.X[idx_y,:])
             if self.y_true[idx_x] == self.y_true[idx_y]:
                 if d_xy > 2*self.rho*self.ris[self.y_true[idx_x]-1]:
-                    return 0
+                    return 2*(np.random.binomial(1,0.5)-0.5)
             else:
                 d_xi = np.linalg.norm(self.X[idx_x,:]-self.centers[self.y_true[idx_x]-1])
                 d_yi = np.linalg.norm(self.X[idx_y,:]-self.centers[self.y_true[idx_y]-1])
                 if (d_xi > self.rho*self.ris[self.y_true[idx_x]-1]) | \
                    (d_yi > self.rho*self.ris[self.y_true[idx_y]-1]):
-                    return 0
+                    return 2*(np.random.binomial(1,0.5)-0.5)
             return 2*(int(self.y_true[idx_x]==self.y_true[idx_y])-0.5)
         else:
             print "Not sure!!!"
-            return 0
+            return 2*(np.random.binomial(1,0.5)-0.5)
 
     # Weak Cluster Assignment Query
     def clusterAssign(self,idx_Z):
