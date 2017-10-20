@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-20 13:46:57
+# @Last Modified time: 2017-10-20 14:03:25
 
 import numpy as np
 import time
@@ -161,7 +161,7 @@ def parse_args():
                         default = 2, type = int)
     parser.add_argument('-std', dest='std',
                         help='standard deviation of Gaussian distribution (default:1.5)',
-                        default = 2.0, type = float)
+                        default = 1.0, type = float)
     parser.add_argument('-qs', dest='qs',
                         help='Probabilities q (not-sure with 1-q) ex) 0.7,0.85,1',
                         default = '0.7,0.85,1', type = str)
