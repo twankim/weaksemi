@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-21 01:17:23
+# @Last Modified time: 2017-10-21 12:42:28
 
 import numpy as np
 import time
@@ -69,7 +69,7 @@ def main(args):
         for i_c,c_dist in enumerate(cs):
             assert (c_dist>0.5) & (c_dist<=1.0), "c_dist must be in (0.5,1]"
 
-            nus[i_rep,i_c] = 1+(float(gamma)-1) / c_dist
+            nus[i_rep,i_c] = float(gamma) / c_dist
             rhos[i_rep,i_c] = c_dist
 
             if verbose:
