@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-21 02:20:31
+# @Last Modified time: 2017-10-21 02:25:14
 
 import numpy as np
 import matplotlib
@@ -152,7 +152,7 @@ def plot_hist(gammas,min_gamma,max_gamma,fig_name):
 
 def plot_cluster(X,y_true,y_pred,k,mpps,gamma,title,f_name,verbose):
     classes = range(k+1)
-    cmap = plt.cm.get_cmap("jet", k+1)
+    cmap = plt.cm.get_cmap("brg", k+1)
     if verbose:
         print " ... Plotting"
     f = plt.figure(figsize=(14,7))
@@ -162,7 +162,7 @@ def plot_cluster(X,y_true,y_pred,k,mpps,gamma,title,f_name,verbose):
     plt.subplot(121)
     for i in xrange(1,k+1):
         idx = y_true==i
-        plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i],alpha=0.8)
+        plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i],alpha=0.7)
     # plt.scatter(X[:,0],X[:,1],c=y_true,label=classes)
     plt.title("True dataset ($\gamma$={:.2f})".format(gamma))
     plt.legend()
@@ -172,7 +172,7 @@ def plot_cluster(X,y_true,y_pred,k,mpps,gamma,title,f_name,verbose):
     for i in xrange(0,k+1):
         idx = np.array(y_pred)==i
         if sum(idx)>0:
-            plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i],alpha=0.8)
+            plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i],alpha=0.7)
     # plt.scatter(X[:,0],X[:,1],c=y_pred,label=classes)
     plt.title("SSAC result ($\gamma$={:.2f})".format(gamma))
     plt.legend()
@@ -180,7 +180,7 @@ def plot_cluster(X,y_true,y_pred,k,mpps,gamma,title,f_name,verbose):
     # Plot estimated cluster centers
     for t in xrange(k):
         mpp = mpps[t]
-        plt.plot(mpp[0],mpp[1],'k^',ms=15,alpha=0.8)
+        plt.plot(mpp[0],mpp[1],'k^',ms=15,alpha=0.7)
 
     f.savefig(f_name,bbox_inches='tight')
     plt.close()
