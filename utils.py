@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-21 02:09:25
+# @Last Modified time: 2017-10-21 02:11:33
 
 import numpy as np
 import matplotlib
@@ -162,7 +162,7 @@ def plot_cluster(X,y_true,y_pred,k,mpps,gamma,title,f_name,verbose):
     plt.subplot(121)
     for i in xrange(1,k+1):
         idx = y_true==i
-        plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i],alpha=0.5)
+        plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i],mec='k')
     # plt.scatter(X[:,0],X[:,1],c=y_true,label=classes)
     plt.title("True dataset ($\gamma$={:.2f})".format(gamma))
     plt.legend()
@@ -172,7 +172,7 @@ def plot_cluster(X,y_true,y_pred,k,mpps,gamma,title,f_name,verbose):
     for i in xrange(0,k+1):
         idx = np.array(y_pred)==i
         if sum(idx)>0:
-            plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i],alpha=0.5)
+            plt.scatter(X[idx,0],X[idx,1],c=cmap(i),label=classes[i],mec='k')
     # plt.scatter(X[:,0],X[:,1],c=y_pred,label=classes)
     plt.title("SSAC result ($\gamma$={:.2f})".format(gamma))
     plt.legend()
@@ -180,7 +180,7 @@ def plot_cluster(X,y_true,y_pred,k,mpps,gamma,title,f_name,verbose):
     # Plot estimated cluster centers
     for t in xrange(k):
         mpp = mpps[t]
-        plt.plot(mpp[0],mpp[1],'w^',ms=15,alpha=0.5)
+        plt.plot(mpp[0],mpp[1],'w^',ms=15,mec='k')
 
     f.savefig(f_name,bbox_inches='tight')
     plt.close()
