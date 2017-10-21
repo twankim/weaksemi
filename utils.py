@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-21 02:25:14
+# @Last Modified time: 2017-10-21 02:25:43
 
 import numpy as np
 import matplotlib
@@ -152,7 +152,7 @@ def plot_hist(gammas,min_gamma,max_gamma,fig_name):
 
 def plot_cluster(X,y_true,y_pred,k,mpps,gamma,title,f_name,verbose):
     classes = range(k+1)
-    cmap = plt.cm.get_cmap("brg", k+1)
+    cmap = plt.cm.get_cmap("jet", k+1)
     if verbose:
         print " ... Plotting"
     f = plt.figure(figsize=(14,7))
