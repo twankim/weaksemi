@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-21 12:42:28
+# @Last Modified time: 2017-10-21 18:02:06
 
 import numpy as np
 import time
@@ -105,7 +105,7 @@ def main(args):
                 if (i_rep == i_plot) and (m<=2):
                     title = r"SSAC with {} weak oracle ($\eta={}, \beta={}, \nu={:.2f}, \rho={:.2f}$)".format(
                                 weak,eta,beta,nus[i_rep,i_c],rhos[i_rep,i_c])
-                    f_name = res_dir+'/fig_n{}_m{}_k{}_c{:3d}_e{:d}.png'.format(n,m,k,int(100*c_dist),int(eta))
+                    f_name = res_dir+'/fig_n{}_m{}_k{}_c{:03d}_e{:d}.png'.format(n,m,k,int(100*c_dist),int(eta))
                     plot_cluster(X,y_true,y_pred_perm,k,mpps,gamma,
                                  title,f_name,verbose)
 
@@ -161,7 +161,7 @@ def parse_args():
                         default = 2, type = int)
     parser.add_argument('-std', dest='std',
                         help='standard deviation of Gaussian distribution (default:1.5)',
-                        default = 2.0, type = float)
+                        default = 2.25, type = float)
     parser.add_argument('-qs', dest='qs',
                         help='Probabilities q (not-sure with 1-q) ex) 0.7,0.85,1',
                         default = '0.7,0.85,1', type = str)
