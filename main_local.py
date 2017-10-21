@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-20 20:59:25
+# @Last Modified time: 2017-10-20 21:01:23
 
 import numpy as np
 import time
@@ -149,7 +149,7 @@ def parse_args():
                         'Test Semi-Supervised Active Clustering with Weak Oracles: Random-weak model')
     parser.add_argument('-rep', dest='rep',
                         help='Number of experiments to repeat',
-                        default = 5000, type = int)
+                        default = 10000, type = int)
     parser.add_argument('-k', dest='k',
                         help='Number of clusters in synthetic data',
                         default = 3, type = int)
