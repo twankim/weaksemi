@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:19:24
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-20 14:32:03
+# @Last Modified time: 2017-10-22 01:58:35
 
 import numpy as np
 
@@ -212,7 +212,9 @@ class SSAC:
             idx_j = int(np.floor((idx_l+idx_r)*0.5))
             
             # Use the closest point as an anchor point for same-cluster query
-            answer = self.weakQuery(idx_S_sorted[0],idx_S_sorted[idx_j])
+            # answer = self.weakQuery(idx_S_sorted[0],idx_S_sorted[idx_j])
+            answer = self.weakQuery(idx_p[np.random.randint(0,len(idx_p))],
+                                    idx_S_sorted[idx_j])
             if answer == 1: # Same cluster
                 idx_l = idx_j+1
             elif answer == -1: # Different cluster

@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-22 02:35:32
+# @Last Modified time: 2017-10-22 02:27:57
 
 import numpy as np
 import time
@@ -14,12 +14,13 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from ssac import weakSSAC
+from ssac_org import SSAC
 from gen_data import genData
 from utils import *
 
 weak = "local"
 delta = 0.99
-base_dir= os.path.join('./results',weak)
+base_dir= os.path.join('./results',weak+'_compare')
 
 def main(args):
     rep = args.rep
@@ -64,6 +65,7 @@ def main(args):
                 i_rep+1,rep,gamma,n,m,k,std)
 
         algo = weakSSAC(X,y_true,k,wtype=weak,ris=ris)
+        algo_org = SSAC(X,y_true,k,wtype=weak,ris=ris)
         # Test SSAC algorithm for different c's and eta's (fix beta in this case)
         # Calculate proper eta and beta based on parameters including delta
         for i_c,c_dist in enumerate(cs):
@@ -161,7 +163,7 @@ def parse_args():
                         default = 2, type = int)
     parser.add_argument('-std', dest='std',
                         help='standard deviation of Gaussian distribution (default:1.5)',
-                        default = 2.25, type = float)
+                        default = 2.0, type = float)
     parser.add_argument('-qs', dest='qs',
                         help='Probabilities q (not-sure with 1-q) ex) 0.7,0.85,1',
                         default = '0.7,0.85,1', type = str)
