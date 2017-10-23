@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:19:24
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-23 00:46:41
+# @Last Modified time: 2017-10-23 00:47:04
 
 import numpy as np
 
@@ -178,7 +178,6 @@ class SSAC:
     # Weak Cluster Assignment Query
     def clusterAssign(self,idx_Z):
         y_Z = [0]*len(idx_Z)
-        print '!'
         for i,idx in enumerate(idx_Z):
             if len(self.clusters)==0: # Currently, none of points are assigned
                 answers = []
