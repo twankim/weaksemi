@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:19:24
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-20 14:31:49
+# @Last Modified time: 2017-10-22 23:53:07
 
 import numpy as np
 
@@ -43,6 +43,8 @@ class weakSSAC:
         self.clusters = [] # Cluster labels which are known
 
         for i_k in xrange(self.k):
+            if len(S)==0:
+                break
             is_overwrite = False # Flag for overwriting assignment
             # --------------- Phase 1 ---------------
             # 1) Sample points for cluster center estimation

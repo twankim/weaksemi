@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:19:24
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-22 01:58:35
+# @Last Modified time: 2017-10-23 00:17:06
 
 import numpy as np
 
@@ -44,6 +44,8 @@ class SSAC:
         self.clusters = [] # Cluster labels which are known
 
         for i_k in xrange(self.k):
+            if len(S)==0:
+                break
             is_overwrite = False # Flag for overwriting assignment
             # --------------- Phase 1 ---------------
             # 1) Sample points for cluster center estimation
@@ -186,6 +188,7 @@ class SSAC:
             else:
                 # Find anchor points from each cluster (Use assignment-known points)
                 # -> Use for cluster assignment queries
+                print self.clusters
                 set_idx = [self.y.index(k) for k in self.clusters]
                 # Ask same-cluster queries
                 answers = [self.weakQuery(idx,idx_set) for idx_set in set_idx]
