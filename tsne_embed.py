@@ -169,17 +169,20 @@ def tsne(X = np.array([]), no_dims = 2, initial_dims = 50, perplexity = 30.0, ma
 def main(args):
     print "Run Y = tsne.tsne(X, no_dims, perplexity) to perform t-SNE on your dataset."
     print "Running example on 2,500 MNIST digits..."
-    
-    digits = [float(digit) for digit in args.digits.split(',')]
-    print "Consider only digits :{}".format([int(digit) for digit in digits])
 
     X = np.loadtxt("dataset/mnist2500_X.txt")
     labels = np.loadtxt("dataset/mnist2500_labels.txt")
 
-    # Select data with only selected labels
-    idx = [(label in digits) for label in labels]
-    labels = labels[idx]
-    X = X[idx,:]
+    if args.digits is not None:
+        digits = [float(digit) for digit in args.digits.split(',')]
+        print "Consider only digits :{}".format([int(digit) for digit in digits])
+
+        # Select data with only selected labels
+        idx = [(label in digits) for label in labels]
+        labels = labels[idx]
+        X = X[idx,:]
+    else:
+        digits = [float(digit) for digit in range(10)]
 
     Y = tsne(X, 2, 50, 20.0,args.max_iter)
     if args.isplot:
@@ -200,7 +203,7 @@ def parse_args():
                         'Run t-SNE on example MNIST data')
     parser.add_argument('-digits', dest='digits',
                         help='digits to consider',
-                        default = '0,6,8,9', type = str)
+                        default = None, type = str)
     parser.add_argument('-iter', dest='max_iter',
                         help='iter: Maximum number of interation',
                         default = 2000, type = int)
