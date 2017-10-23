@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-23 14:56:19
+# @Last Modified time: 2017-10-23 15:53:50
 
 import numpy as np
 import matplotlib
@@ -104,7 +104,7 @@ def plot_eval(eval_metric,res,etas,fig_name,
               is_sum=False,weak='random',params=None,res_org=None):
     assert weak in ['random','local','global'], \
                     "weak must be in ['random','local','global']"
-    cmap = plt.cm.get_cmap("jet", len(params)+1)
+    cmap = plt.cm.get_cmap("jet", len(params))
 
     if weak == 'random':
         i_name = 'q'
@@ -149,9 +149,11 @@ def plot_eval(eval_metric,res,etas,fig_name,
     if "accuracy" in eval_metric.lower():
         plt.legend(loc=4)
         min_val = min(res_plt.min(),res_org_plt.min())
-        plt.ylim([min_val-(105-min_val)*0.25,105])
+        plt.ylim([min_val-(100-min_val)*0.3,100.5])
     elif ("error" in eval_metric.lower()) or ("fail" in eval_metric.lower()):
         plt.legend(loc=1)
+        # min_val = min(res_plt.min(),res_org_plt.min())
+        # plt.ylim([min_val-(100-min_val)*0.25,105])
     else:
         plt.legend(loc=4)
     plt.xlim([0,np.round(1.2*max(etas))])
