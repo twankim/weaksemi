@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-21 18:01:12
+# @Last Modified time: 2017-10-22 19:58:32
 
 import numpy as np
 import time
@@ -109,7 +109,6 @@ def main(args):
                                  title,f_name,verbose)
 
     # Write result as table
-    fname = res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("acc",n,m,k)
     print_eval("Accuracy(%)",res_acc,etas,
                res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("acc",n,m,k),weak=weak,params=cs)
     print_eval("Mean Accuracy(%)",res_mean_acc,etas,

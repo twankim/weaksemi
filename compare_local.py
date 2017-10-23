@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-22 02:37:32
+# @Last Modified time: 2017-10-22 20:00:09
 
 import numpy as np
 import time
@@ -40,6 +40,12 @@ def main(args):
     res_mean_acc = np.zeros((rep,len(cs),len(etas))) # Mean accuracy of clustering (per cluster)
     # res_err = np.zeros((rep,len(qs),len(etas))) # Number of misclustered points
     res_fail = np.zeros((rep,len(cs),len(etas))) # Number of Failure
+
+    res_acc_org = np.zeros((rep,len(cs),len(etas))) # Accuracy of clustering
+    res_mean_acc_org = np.zeros((rep,len(cs),len(etas))) # Mean accuracy of clustering (per cluster)
+    # res_err = np.zeros((rep,len(qs),len(etas))) # Number of misclustered points
+    res_fail_org = np.zeros((rep,len(cs),len(etas))) # Number of Failure
+
     gammas = np.zeros(rep)
     nus = np.zeros((rep,len(cs)))
     rhos = np.zeros((rep,len(cs)))
@@ -84,8 +90,13 @@ def main(args):
                 if verbose:
                     print "     <Test: c_dist={}, eta={}, beta={}>".format(c_dist,eta,beta)
                 algo.set_params(eta,beta,rho=rhos[i_rep,i_c],nu=nus[i_rep,i_c])
+                algo_org.set_params(eta,beta,rho=rhos[i_rep,i_c],nu=nus[i_rep,i_c])
 
                 if not algo.fit():
+                    # Algorithm has failed
+                    res_fail[i_rep,i_c,i_eta] = 1
+                    i_plot = np.random.randint(i_rep+1,rep) # Index of experiment to plot the figure
+                if not algo_org.fit():
                     # Algorithm has failed
                     res_fail[i_rep,i_c,i_eta] = 1
                     i_plot = np.random.randint(i_rep+1,rep) # Index of experiment to plot the figure
@@ -93,13 +104,18 @@ def main(args):
                 y_pred = algo.y
                 mpps = algo.mpps # Estimated cluster centers
                 # print "     ... Clustering is done. Number of binary search steps = {}\n".format(algo.bs_num)
+                y_pred_org = algo_org.y
+                mpps_org = algo_org.mpps # Estimated cluster centers
 
                 # For evaluation & plotting, find best permutation of cluster assignment
                 y_pred_perm = find_permutation(dataset,algo)
+                y_pred_perm_org = find_permutation(dataset,algo_org)
 
                 # Calculate accuracy and mean accuracy
                 res_acc[i_rep,i_c,i_eta] = accuracy(y_true,y_pred_perm)
                 res_mean_acc[i_rep,i_c,i_eta] = mean_accuracy(y_true,y_pred_perm)
+                res_acc_org[i_rep,i_c,i_eta] = accuracy(y_true,y_pred_perm_org)
+                res_mean_acc_org[i_rep,i_c,i_eta] = mean_accuracy(y_true,y_pred_perm_org)
 
                 # # Calculate number of errors
                 # res_err[i_rep,i_c,i_eta] = error(y_true,y_pred_perm)
@@ -110,9 +126,13 @@ def main(args):
                     f_name = res_dir+'/fig_n{}_m{}_k{}_c{:03d}_e{:d}.png'.format(n,m,k,int(100*c_dist),int(eta))
                     plot_cluster(X,y_true,y_pred_perm,k,mpps,gamma,
                                  title,f_name,verbose)
+                    title_org = r"SSAC(original) with {} weak oracle ($\eta={}, \beta={}, \nu={:.2f}, \rho={:.2f}$)".format(
+                                weak,eta,beta,nus[i_rep,i_c],rhos[i_rep,i_c])
+                    f_name_org = res_dir+'/fig_org_n{}_m{}_k{}_c{:03d}_e{:d}.png'.format(n,m,k,int(100*c_dist),int(eta))
+                    plot_cluster(X,y_true,y_pred_perm_org,k,mpps_org,gamma,
+                                 title_org,f_name_org,verbose)
 
     # Write result as table
-    fname = res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("acc",n,m,k)
     print_eval("Accuracy(%)",res_acc,etas,
                res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("acc",n,m,k),weak=weak,params=cs)
     print_eval("Mean Accuracy(%)",res_mean_acc,etas,
@@ -122,19 +142,29 @@ def main(args):
     print_eval("# Failure",res_fail,etas,
                res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("fail",n,m,k),
                is_sum=True,weak=weak,params=cs)
+    
+    print_eval("Accuracy(%)",res_acc_org,etas,
+               res_dir+'/res_org_{}_n{}_m{}_k{}.csv'.format("acc",n,m,k),weak=weak,params=cs)
+    print_eval("Mean Accuracy(%)",res_mean_acc_org,etas,
+               res_dir+'/res_org_{}_n{}_m{}_k{}.csv'.format("meanacc",n,m,k),weak=weak,params=cs)
+    # print_eval("# Error(%)",res_err,qs,etas,
+    #            res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("err",n,m,k))
+    print_eval("# Failure",res_fail_org,etas,
+               res_dir+'/res_org_{}_n{}_m{}_k{}.csv'.format("fail",n,m,k),
+               is_sum=True,weak=weak,params=cs)
 
     # if args.isplot:
     # Plot Accuracy vs. eta
     fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("acc",n,m,k)
-    plot_eval("Accuracy(%)",res_acc,etas,fig_name,weak=weak,params=cs)
+    plot_eval("Accuracy(%)",res_acc,etas,fig_name,weak=weak,params=cs,res_org=res_acc_org)
 
     # Plot Mean Accuracy vs. eta
     fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("meanacc",n,m,k)
-    plot_eval("Mean Accuracy(%)",res_mean_acc,etas,fig_name,weak=weak,params=cs)
+    plot_eval("Mean Accuracy(%)",res_mean_acc,etas,fig_name,weak=weak,params=cs,res_org=res_acc_org)
 
     # Plot Failure vs. eta
     fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("fail",n,m,k)
-    plot_eval("# Failure",res_fail,etas,fig_name,is_sum=True,weak=weak,params=cs)
+    plot_eval("# Failure",res_fail,etas,fig_name,is_sum=True,weak=weak,params=cs,res_org=res_acc_org)
 
     # Plot histogram of gammas
     fig_name = res_dir+'/fig_gamma_hist.pdf'
