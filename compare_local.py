@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-22 20:00:09
+# @Last Modified time: 2017-10-22 21:36:43
 
 import numpy as np
 import time
@@ -98,7 +98,7 @@ def main(args):
                     i_plot = np.random.randint(i_rep+1,rep) # Index of experiment to plot the figure
                 if not algo_org.fit():
                     # Algorithm has failed
-                    res_fail[i_rep,i_c,i_eta] = 1
+                    res_fail_org[i_rep,i_c,i_eta] = 1
                     i_plot = np.random.randint(i_rep+1,rep) # Index of experiment to plot the figure
                 
                 y_pred = algo.y
