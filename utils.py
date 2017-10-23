@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-22 21:08:49
+# @Last Modified time: 2017-10-22 21:19:37
 
 import numpy as np
 import matplotlib
@@ -122,7 +122,7 @@ def plot_eval(eval_metric,res,etas,fig_name,
             plt.plot(etas,res.mean(axis=0)[i_p,:],
                      'x-',c=cmap(i_p),
                      label=r'SSAC(ours) ${}={}$'.format(i_name,param))
-            if res_org:
+            if res_org is not None:
                 plt.plot(etas,res_org.mean(axis=0)[i_p,:],
                          'o--',c=cmap(i_p),
                          label=r'SSAC(original) ${}={}$'.format(i_name,param))
