@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-23 14:45:46
+# @Last Modified time: 2017-10-23 14:56:19
 
 import numpy as np
 import matplotlib
@@ -115,35 +115,41 @@ def plot_eval(eval_metric,res,etas,fig_name,
 
     rep = res.shape[0]
     if not is_sum:
+        res_plt = res.mean(axis=0)
+        res_org_plt = res_org.mean(axis=0)
         f = plt.figure()
         plt.title(r"{}. {}-weak (Averaged over {} experiments)".format(
                             eval_metric,t_name,rep))
         for i_p,param in enumerate(params):
-            plt.plot(etas,res.mean(axis=0)[i_p,:],
+            plt.plot(etas,res_plt[i_p,:],
                      'x-',c=cmap(i_p),
                      label=r'SSAC(ours) ${}={}$'.format(i_name,param))
             if res_org is not None:
-                plt.plot(etas,res_org.mean(axis=0)[i_p,:],
+                plt.plot(etas,res_org_plt[i_p,:],
                          'o--',c=cmap(i_p),
                          label=r'SSAC(original) ${}={}$'.format(i_name,param))
         plt.xlabel(r"$\eta$ (Number of samples per cluster)")
         plt.ylabel(eval_metric)
     else:
+        res_plt = res.sum(axis=0)
+        res_org_plt = res_org.sum(axis=0)
         f = plt.figure()
         plt.title(r"{}. {}-weak (Total sum over {} experiments)".format(
                             eval_metric,t_name,rep))
         for i_p,param in enumerate(params):
-            plt.plot(etas,res.sum(axis=0)[i_p,:],
+            plt.plot(etas,res_plt[i_p,:],
                      'x-',c=cmap(i_p),
                      label=r'SSAC(ours) ${}={}$'.format(i_name,param))
             if res_org is not None:
-                plt.plot(etas,res_org.sum(axis=0)[i_p,:],
+                plt.plot(etas,res_org_plt[i_p,:],
                          'o--',c=cmap(i_p),
                          label=r'SSAC(oroginal) ${}={}$'.format(i_name,param))
         plt.xlabel(r"$\eta$ (Number of samples per cluster)")
         plt.ylabel(eval_metric)
     if "accuracy" in eval_metric.lower():
         plt.legend(loc=4)
+        min_val = min(res_plt.min(),res_org_plt.min())
+        plt.ylim([min_val-(105-min_val)*0.25,105])
     elif ("error" in eval_metric.lower()) or ("fail" in eval_metric.lower()):
         plt.legend(loc=1)
     else:
