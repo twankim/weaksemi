@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:19:24
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-23 00:17:06
+# @Last Modified time: 2017-10-23 00:20:54
 
 import numpy as np
 
@@ -188,7 +188,7 @@ class SSAC:
             else:
                 # Find anchor points from each cluster (Use assignment-known points)
                 # -> Use for cluster assignment queries
-                print self.clusters
+                print self.clusters, np.unique(self.y)
                 set_idx = [self.y.index(k) for k in self.clusters]
                 # Ask same-cluster queries
                 answers = [self.weakQuery(idx,idx_set) for idx_set in set_idx]
