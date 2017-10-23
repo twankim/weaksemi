@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:19:24
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-23 00:31:12
+# @Last Modified time: 2017-10-23 00:45:52
 
 import numpy as np
 
@@ -196,7 +196,9 @@ class SSAC:
                 if 1 in answers:
                     y_Z[i] = self.y[set_idx[answers.index(1)]]
                 elif sum(answers) == -len(self.clusters):
-                    if len(self.clusters) < self.k:
+                    if self.y[idx] != 0:
+                        print "Use previously assigned cluster"
+                    elif len(self.clusters) < self.k:
                         y_Z[i] = [k_n for k_n in xrange(1,self.k+1) if k_n not in self.clusters][0]
                         self.clusters.append(y_Z[i])
                         self.y[idx] = y_Z[i] # Update cluster assignment
