@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-22 20:02:42
+# @Last Modified time: 2017-10-22 21:08:49
 
 import numpy as np
 import matplotlib
@@ -120,11 +120,11 @@ def plot_eval(eval_metric,res,etas,fig_name,
                             eval_metric,t_name,rep))
         for i_p,param in enumerate(params):
             plt.plot(etas,res.mean(axis=0)[i_p,:],
-                     'x-',c=cmap(i),
+                     'x-',c=cmap(i_p),
                      label=r'SSAC(ours) ${}={}$'.format(i_name,param))
             if res_org:
                 plt.plot(etas,res_org.mean(axis=0)[i_p,:],
-                         'o--',c=cmap(i),
+                         'o--',c=cmap(i_p),
                          label=r'SSAC(original) ${}={}$'.format(i_name,param))
         plt.xlabel(r"$\eta$ (Number of samples per cluster)")
         plt.ylabel(eval_metric)
@@ -134,11 +134,11 @@ def plot_eval(eval_metric,res,etas,fig_name,
                             eval_metric,t_name,rep))
         for i_p,param in enumerate(params):
             plt.plot(etas,res.sum(axis=0)[i_p,:],
-                     'x-',c=cmap(i),
+                     'x-',c=cmap(i_p),
                      label=r'SSAC(ours) ${}={}$'.format(i_name,param))
             if res_org:
                 plt.plot(etas,res_org.sum(axis=0)[i_p,:],
-                         'x-',c=cmap(i),
+                         'x-',c=cmap(i_p),
                          label=r'SSAC(oroginal) ${}={}$'.format(i_name,param))
         plt.xlabel(r"$\eta$ (Number of samples per cluster)")
         plt.ylabel(eval_metric)
