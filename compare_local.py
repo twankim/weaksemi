@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-22 21:36:43
+# @Last Modified time: 2017-10-22 21:42:29
 
 import numpy as np
 import time
@@ -160,11 +160,11 @@ def main(args):
 
     # Plot Mean Accuracy vs. eta
     fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("meanacc",n,m,k)
-    plot_eval("Mean Accuracy(%)",res_mean_acc,etas,fig_name,weak=weak,params=cs,res_org=res_acc_org)
+    plot_eval("Mean Accuracy(%)",res_mean_acc,etas,fig_name,weak=weak,params=cs,res_org=res_mean_acc_org)
 
     # Plot Failure vs. eta
     fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("fail",n,m,k)
-    plot_eval("# Failure",res_fail,etas,fig_name,is_sum=True,weak=weak,params=cs,res_org=res_acc_org)
+    plot_eval("# Failure",res_fail,etas,fig_name,is_sum=True,weak=weak,params=cs,res_org=res_fail_org)
 
     # Plot histogram of gammas
     fig_name = res_dir+'/fig_gamma_hist.pdf'
