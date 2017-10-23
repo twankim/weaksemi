@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-23 03:10:59
+# @Last Modified time: 2017-10-23 11:37:20
 
 import numpy as np
 import time
@@ -126,11 +126,11 @@ def main(args):
                     f_name = res_dir+'/fig_n{}_m{}_k{}_c{:03d}_e{:d}.png'.format(n,m,k,int(100*c_dist),int(eta))
                     plot_cluster(X,y_true,y_pred_perm,k,mpps,gamma,
                                  title,f_name,verbose)
-                    title_org = r"SSAC(original) with {} weak oracle ($\eta={}, \beta={}, \nu={:.2f}, \rho={:.2f}$)".format(
-                                weak,eta,beta,nus[i_rep,i_c],rhos[i_rep,i_c])
-                    f_name_org = res_dir+'/fig_org_n{}_m{}_k{}_c{:03d}_e{:d}.png'.format(n,m,k,int(100*c_dist),int(eta))
-                    plot_cluster(X,y_true,y_pred_perm_org,k,mpps_org,gamma,
-                                 title_org,f_name_org,verbose)
+                    # title_org = r"SSAC(original) with {} weak oracle ($\eta={}, \beta={}, \nu={:.2f}, \rho={:.2f}$)".format(
+                    #             weak,eta,beta,nus[i_rep,i_c],rhos[i_rep,i_c])
+                    # f_name_org = res_dir+'/fig_org_n{}_m{}_k{}_c{:03d}_e{:d}.png'.format(n,m,k,int(100*c_dist),int(eta))
+                    # plot_cluster(X,y_true,y_pred_perm_org,k,mpps_org,gamma,
+                    #              title_org,f_name_org,verbose)
 
     # Write result as table
     print_eval("Accuracy(%)",res_acc,etas,
