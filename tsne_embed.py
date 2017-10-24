@@ -207,7 +207,7 @@ def main(args):
             idx = labels==digit
             if sum(idx)>0:
                 plt.scatter(Y[idx,0], Y[idx,1], c=cmap(i),label=int(digit),alpha=0.7)
-        plt.title("t-SNE result ")
+        plt.title(r"t-SNE result ($\gamma={}$)".format(mnist2500.gamma))
         plt.legend(loc='best')
         plt.show()
 
