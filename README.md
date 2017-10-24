@@ -44,3 +44,6 @@ ex) run main_local.py or main_global.py for distance-weak oracle models
 ```
 python main.py -k 3 -qs 0.7,0.85,1 -etas 2,5,10,50 -g_min 1.0 -g_max 1.2
 ```
+
+## Comparison of weakSSAC and SSAC
+run *compare_{weakness}.py* to compare original SSAC and our improved weakSSAC. Original SSAC will receive random answers (in the same cluster/not in the same cluster with probability 0.5) whenever it encounters not-sure situation.
