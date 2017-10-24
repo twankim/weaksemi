@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-23 18:45:25
+# @Last Modified time: 2017-10-24 00:30:17
 
 import numpy as np
 import matplotlib
@@ -104,7 +104,8 @@ def plot_eval(eval_metric,res,etas,fig_name,
               is_sum=False,weak='random',params=None,res_org=None):
     assert weak in ['random','local','global'], \
                     "weak must be in ['random','local','global']"
-    cmap = plt.cm.get_cmap("jet", len(params))
+    # cmap = plt.cm.get_cmap("jet", len(params)) -> cmap(i_p)
+    cmap = ['r','b','g','k','y','m','c']
 
     if weak == 'random':
         i_name = 'q'
@@ -122,11 +123,11 @@ def plot_eval(eval_metric,res,etas,fig_name,
                             eval_metric,t_name,rep))
         for i_p,param in enumerate(params):
             plt.plot(etas,res_plt[i_p,:],
-                     'x-',c=cmap(i_p),
+                     'x-',c=cmap[i_p],
                      label=r'SSAC(ours) ${}={}$'.format(i_name,param))
             if res_org is not None:
                 plt.plot(etas,res_org_plt[i_p,:],
-                         'o--',c=cmap(i_p),
+                         'o--',c=cmap[i_p],
                          label=r'SSAC(original) ${}={}$'.format(i_name,param))
         plt.xlabel(r"$\eta$ (Number of samples per cluster)")
         plt.ylabel(eval_metric)
@@ -138,11 +139,11 @@ def plot_eval(eval_metric,res,etas,fig_name,
                             eval_metric,t_name,rep))
         for i_p,param in enumerate(params):
             plt.plot(etas,res_plt[i_p,:],
-                     'x-',c=cmap(i_p),
+                     'x-',c=cmap[i_p],
                      label=r'SSAC(ours) ${}={}$'.format(i_name,param))
             if res_org is not None:
                 plt.plot(etas,res_org_plt[i_p,:],
-                         'o--',c=cmap(i_p),
+                         'o--',c=cmap[i_p],
                          label=r'SSAC(oroginal) ${}={}$'.format(i_name,param))
         plt.xlabel(r"$\eta$ (Number of samples per cluster)")
         plt.ylabel(eval_metric)
