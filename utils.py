@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-24 00:31:56
+# @Last Modified time: 2017-10-24 00:38:34
 
 import numpy as np
 import matplotlib
@@ -150,14 +150,14 @@ def plot_eval(eval_metric,res,etas,fig_name,
     if "accuracy" in eval_metric.lower():
         plt.legend(loc=4)
         min_val = min(res_plt.min(),res_org_plt.min())
-        ylim_min = min_val-(100-min_val)*0.7
+        ylim_min = min_val-(100-min_val)*0.5
         ylim_max = 100.5
         plt.ylim([ylim_min,ylim_max])
     elif ("error" in eval_metric.lower()) or ("fail" in eval_metric.lower()):
         plt.legend(loc=1)
         max_val = max(res_plt.max(),res_org_plt.max())
         ylim_min = -0.5
-        ylim_max = max_val*1.35
+        ylim_max = max_val*1.3
         plt.ylim([ylim_min,ylim_max])
     else:
         plt.legend(loc=4)
