@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-24 01:24:40
+# @Last Modified time: 2017-10-24 03:26:02
 
 import numpy as np
 import matplotlib
@@ -156,7 +156,7 @@ def plot_eval(eval_metric,res,etas,fig_name,
     elif ("error" in eval_metric.lower()) or ("fail" in eval_metric.lower()):
         plt.legend(loc=1)
         max_val = max(res_plt.max(),res_org_plt.max())
-        ylim_min = 0 - maxval*0.1
+        ylim_min = 0 - max_val*0.1
         ylim_max = max_val*1.3
         plt.ylim([ylim_min,ylim_max])
     else:

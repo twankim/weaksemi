@@ -16,6 +16,8 @@ import sys
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
+import cPickle as pickle
+from data import DATASET
 
 def Hbeta(D = np.array([]), beta = 1.0):
     """Compute the perplexity and the P-row for a specific value of the precision of a Gaussian distribution."""
@@ -185,6 +187,20 @@ def main(args):
         digits = [float(digit) for digit in range(10)]
 
     Y = tsne(X, 2, 50, 20.0,args.max_iter)
+
+    dict_label = {}
+    temp_dict = {}
+    for i,digit in enumerate(digits):
+        dict_label[i] = digit
+        temp_dict[digit] = i
+
+    labels_k = np.array([temp_dict[label] for label in labels])
+
+    mnist2500 = DATASET(Y, labels_k, X_org=X, dict_label=dict_label)
+
+    with open('dataset/mnist2500.pkl','wb') as fp:
+        pickle.dump(mnist2500, fp, protocol=pickle.HIGHEST_PROTOCOL)
+
     if args.isplot:
         cmap = plt.cm.get_cmap("jet", len(digits))
         for i,digit in enumerate(digits):
