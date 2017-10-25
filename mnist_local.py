@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-25 14:53:07
+# @Last Modified time: 2017-10-25 17:19:50
 
 import numpy as np
 import time
@@ -19,7 +19,7 @@ from ssac_org import SSAC
 from utils import *
 import cPickle as pickle
 
-weak = "weak"
+weak = "local"
 delta = 0.99
 base_dir= os.path.join('./results',weak+'_compare_mnist')
 
