@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-24 01:36:20
+# @Last Modified time: 2017-10-25 02:53:31
 
 import numpy as np
 import time
@@ -17,21 +17,23 @@ from ssac import weakSSAC
 from ssac_org import SSAC
 # from gen_data import genData
 from utils import *
+import cPickle as pickle
 
 weak = "global"
 delta = 0.99
-base_dir= os.path.join('./results',weak+'_compare')
+base_dir= os.path.join('./results',weak+'_compare_mnist')
 
 def main(args):
+    # Load MNIST 2500 subset
+    with open('dataset/mnist2500.pkl','rb') as fp:
+        dataset = pickle.load(fp)
+
     rep = args.rep
-    k = args.k
-    n = args.n
-    m = args.m
-    std = args.std
+    i_plot = 0
+
     # qs = [float(q) for q in args.qs.split(',')]
     etas = [float(eta) for eta in args.etas.split(',')]
     beta = args.beta
-    i_plot = np.random.randint(0,rep) # Index of experiment to plot the figure
     verbose = args.verbose
 
     cs = [float(q) for q in args.cs.split(',')]
@@ -49,25 +51,31 @@ def main(args):
     gammas = np.zeros(rep)
     rhos = np.zeros((rep,len(cs)))
 
+    digits = [str(int(dataset.dict_label[label])) for label in dataset.dict_label.keys()]
     # Make directories to save results
     if not os.path.exists(base_dir):
         os.makedirs(base_dir)
-    res_dir = base_dir + '/{}_{}'.format(args.min_gamma,args.max_gamma)
+    res_dir = base_dir + '/{}'.format(
+        ','.join(digits))
     if not os.path.exists(res_dir):
         os.makedirs(res_dir)
 
+    if verbose:
+        print "MNIST2500 Subset... Digits:{}".format(','.join(digits))
+
     for i_rep in xrange(rep):
-        # Generate Synthetic data
-        # m dimensional, n points, k cluster
-        # min_gamma: minimum gamma margin
         if verbose:
-            print "({}/{})... Generating data".format(i_rep+1,rep)
-        dataset = genData(n,m,k,args.min_gamma,args.max_gamma,std)
-        X,y_true,ris = dataset.gen()
+            print "({}/{})... Testing Algorithm".format(i_rep+1,rep)
+        X = dataset.X
+        y_true = dataset.y
+        ris = dataset.ris
         gamma = dataset.gamma
         gammas[i_rep] = gamma
-        print "({}/{})... Synthetic data is generated: gamma={}, (n,m,k,std)=({},{},{},{})".format(
-                i_rep+1,rep,gamma,n,m,k,std)
+
+        n = dataset.n
+        m = dataset.m
+        k = dataset.k
+
 
         algo = weakSSAC(X,y_true,k,wtype=weak,ris=ris)
         algo_org = SSAC(X,y_true,k,wtype=weak,ris=ris)
@@ -119,11 +127,15 @@ def main(args):
                 # res_err[i_rep,i_c,i_eta] = error(y_true,y_pred_perm)
 
                 if (i_rep == i_plot) and (m<=2):
+                    list_classes = ['Not assigned']
+                    for i in xrange(k):
+                        list_classes.append('Digit {}'.format(i))
                     title = r"SSAC with {} weak oracle ($\eta={}, \beta={}, \rho={:.2f}$)".format(
                                 weak,eta,beta,rhos[i_rep,i_c])
                     f_name = res_dir+'/fig_n{}_m{}_k{}_c{:03d}_e{:d}.png'.format(n,m,k,int(100*c_dist),int(eta))
                     plot_cluster(X,y_true,y_pred_perm,k,mpps,gamma,
-                                 title,f_name,verbose)
+                                 title,f_name,verbose,
+                                 classes=list_classes)
                     # title_org = r"SSAC(original) with {} weak oracle ($\eta={}, \beta={}, \rho={:.2f}$)".format(
                     #             weak,eta,beta,rhos[i_rep,i_c])
                     # f_name_org = res_dir+'/fig_org_n{}_m{}_k{}_c{:03d}_e{:d}.png'.format(n,m,k,int(100*c_dist),int(eta))
@@ -164,9 +176,9 @@ def main(args):
     fig_name = res_dir+'/fig_{}_n{}_m{}_k{}.pdf'.format("fail",n,m,k)
     plot_eval("# Failure",res_fail,etas,fig_name,is_sum=True,weak=weak,params=cs,res_org=res_fail_org)
 
-    # Plot histogram of gammas
-    fig_name = res_dir+'/fig_gamma_hist.pdf'
-    plot_hist(gammas,args.min_gamma,args.max_gamma,fig_name)
+    # # Plot histogram of gammas
+    # fig_name = res_dir+'/fig_gamma_hist.pdf'
+    # plot_hist(gammas,args.min_gamma,args.max_gamma,fig_name)
 
     if args.isplot:
         plt.show()
@@ -177,9 +189,12 @@ def parse_args():
 
     parser = argparse.ArgumentParser(description=
                         'Test Semi-Supervised Active Clustering with Weak Oracles: Random-weak model')
-    parser.add_argument('-m', dest='m',
-                        help='Dimension of data points in synthetic data',
-                        default = 2, type = int)
+    # parser.add_argument('-m', dest='m',
+    #                     help='Dimension of data points in synthetic data',
+    #                     default = 2, type = int)
+    parser.add_argument('-rep', dest='rep',
+                        help='Number of experiments to repeat',
+                        default = 1000, type = int)
     parser.add_argument('-qs', dest='qs',
                         help='Probabilities q (not-sure with 1-q) ex) 0.7,0.85,1',
                         default = '0.7,0.85,1', type = str)
@@ -191,7 +206,7 @@ def parse_args():
                         default = 1, type = int)
     parser.add_argument('-cs', dest='cs',
                         help='Fractions to set distance-weak parameters (0.5,1] ex) 0.7,0.85,1',
-                        default = '0.7,0.85,1', type = str)
+                        default = '0.6,0.8,1', type = str)
     parser.add_argument('-isplot', dest='isplot',
                         help='plot the result: True/False',
                         default = False, type = str2bool)

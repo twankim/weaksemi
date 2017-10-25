@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:22:13
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-24 12:02:58
+# @Last Modified time: 2017-10-24 23:42:36
 
 import numpy as np
 import matplotlib
@@ -150,8 +150,9 @@ def plot_eval(eval_metric,res,etas,fig_name,
     if "accuracy" in eval_metric.lower():
         plt.legend(loc=4)
         min_val = min(res_plt.min(),res_org_plt.min())
-        ylim_min = min_val-(100-min_val)*0.55
-        ylim_max = 100+(100-min_val)*0.1
+        max_val = max(res_plt.max(),res_org_plt.max())
+        ylim_min = min_val-(max_val-min_val)*0.55
+        ylim_max = max_val+(max_val-min_val)*0.05
         plt.ylim([ylim_min,ylim_max])
     elif ("error" in eval_metric.lower()) or ("fail" in eval_metric.lower()):
         plt.legend(loc=1)
@@ -180,8 +181,11 @@ def plot_hist(gammas,min_gamma,max_gamma,fig_name):
 
     f.savefig(fig_name,bbox_inches='tight')
 
-def plot_cluster(X,y_true,y_pred,k,mpps,gamma,title,f_name,verbose):
-    classes = range(k+1)
+def plot_cluster(X,y_true,y_pred,k,mpps,gamma,title,f_name,verbose,classes=None):
+    if classes is not None:
+        classes = classes
+    else:
+        classes = range(k+1)
     cmap = plt.cm.get_cmap("jet", k+1)
     if verbose:
         print " ... Plotting"
