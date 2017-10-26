@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-25 17:19:50
+# @Last Modified time: 2017-10-25 20:25:10
 
 import numpy as np
 import time
@@ -84,7 +84,7 @@ def main(args):
         for i_c,c_dist in enumerate(cs):
             assert (c_dist>0.5) & (c_dist<=1.0), "c_dist must be in (0.5,1]"
 
-            nus[i_rep,i_c] = float(gamma) + 1.5*(1-c_dist)
+            nus[i_rep,i_c] = 1 + 1.5*(1-c_dist)
             rhos[i_rep,i_c] = c_dist
 
             # Calculate proper eta and beta based on parameters including delta

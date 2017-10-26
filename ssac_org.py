@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-05-05 20:19:24
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-23 00:47:04
+# @Last Modified time: 2017-10-25 18:13:26
 
 import numpy as np
 
@@ -215,7 +215,7 @@ class SSAC:
         while idx_l <= idx_r:
             idx_j = int(np.floor((idx_l+idx_r)*0.5))
             
-            # Use the closest point as an anchor point for same-cluster query
+            # Use random cluster-known point as an anchor point for same-cluster query
             # answer = self.weakQuery(idx_S_sorted[0],idx_S_sorted[idx_j])
             answer = self.weakQuery(idx_p[np.random.randint(0,len(idx_p))],
                                     idx_S_sorted[idx_j])
@@ -224,20 +224,21 @@ class SSAC:
             elif answer == -1: # Different cluster
                 idx_r = idx_j-1
             else:
-                # Not sure
-                # Sample beta-1 additional points
-                set_idx_B = np.random.randint(0,len(idx_p),self.beta-1)
-                answers = [self.weakQuery(idx_p[idx_B],
-                                          idx_S_sorted[idx_j]) for idx_B in set_idx_B]
-                if 1 in answers:
-                    idx_l = idx_j+1
-                elif -1 in answers:
-                    idx_r = idx_j-1
-                else:
-                    # Can return fail, but regard it as not in the same cluster
-                    # Follows the unified-weak BinarySearch model.
-                    print "    Not-sure in Binary Search. -> Regard as different clusters"
-                    idx_r = idx_j-1
+                print "!!!!!!!!!!!!!!Wrong in binary search of SSAC_ORG"
+                # # Not sure
+                # # Sample beta-1 additional points
+                # set_idx_B = np.random.randint(0,len(idx_p),self.beta-1)
+                # answers = [self.weakQuery(idx_p[idx_B],
+                #                           idx_S_sorted[idx_j]) for idx_B in set_idx_B]
+                # if 1 in answers:
+                #     idx_l = idx_j+1
+                # elif -1 in answers:
+                #     idx_r = idx_j-1
+                # else:
+                #     # Can return fail, but regard it as not in the same cluster
+                #     # Follows the unified-weak BinarySearch model.
+                #     print "    Not-sure in Binary Search. -> Regard as different clusters"
+                #     idx_r = idx_j-1
             bs_num += 1
 
         self.bs_num = bs_num
