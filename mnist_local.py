@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-25 20:25:10
+# @Last Modified time: 2017-10-25 22:32:32
 
 import numpy as np
 import time
@@ -24,6 +24,7 @@ delta = 0.99
 base_dir= os.path.join('./results',weak+'_compare_mnist')
 
 def main(args):
+    plotted = False
     # Load MNIST 2500 subset
     with open('dataset/mnist2500.pkl','rb') as fp:
         dataset = pickle.load(fp)
@@ -103,7 +104,8 @@ def main(args):
                 if not algo.fit():
                     # Algorithm has failed
                     res_fail[i_rep,i_c,i_eta] = 1
-                    i_plot = np.random.randint(i_rep+1,rep) # Index of experiment to plot the figure
+                    if not plotted:
+                        i_plot = np.random.randint(i_rep+1,rep) # Index of experiment to plot the figure
                 if not algo_org.fit():
                     # Algorithm has failed
                     res_fail_org[i_rep,i_c,i_eta] = 1
@@ -128,7 +130,9 @@ def main(args):
                 # # Calculate number of errors
                 # res_err[i_rep,i_c,i_eta] = error(y_true,y_pred_perm)
 
-                if (i_rep == i_plot) and (m<=2):
+                if (i_rep == i_plot) and (m<=2) and (not plotted):
+                    if (i_eta==len(etas)-1) and (i_c==len(cs)-1):
+                        plotted = True
                     list_classes = ['Not assigned']
                     for i in xrange(k):
                         list_classes.append('Digit {}'.format(i))

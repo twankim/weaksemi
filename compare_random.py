@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-24 00:24:09
+# @Last Modified time: 2017-10-25 22:34:23
 
 import numpy as np
 import time
@@ -23,6 +23,7 @@ delta = 0.99
 base_dir= os.path.join('./results',weak+'_compare')
 
 def main(args):
+    plotted = False
     rep = args.rep
     k = args.k
     n = args.n
@@ -86,7 +87,8 @@ def main(args):
                 if not algo.fit():
                     # Algorithm has failed
                     res_fail[i_rep,i_q,i_eta] = 1
-                    i_plot = np.random.randint(i_rep+1,rep) # Index of experiment to plot the figure
+                    if not plotted:
+                        i_plot = np.random.randint(i_rep+1,rep) # Index of experiment to plot the figure
                 if not algo_org.fit():
                     # Algorithm has failed
                     res_fail_org[i_rep,i_q,i_eta] = 1
@@ -111,7 +113,9 @@ def main(args):
                 # # Calculate number of errors
                 # res_err[i_rep,i_q,i_eta] = error(y_true,y_pred_perm)
 
-                if (i_rep == i_plot) and (m<=2):
+                if (i_rep == i_plot) and (m<=2) and (not plotted):
+                    if (i_eta==len(etas)-1) and (i_q==len(qs)-1):
+                        plotted = True
                     title = r"SSAC with {} weak oracle ($q={},\eta={}, \beta={}$)".format(weak,q,eta,beta)
                     f_name = res_dir+'/fig_n{}_m{}_k{}_q{:03d}_e{:d}.png'.format(n,m,k,int(100*q),int(eta))
                     plot_cluster(X,y_true,y_pred_perm,k,mpps,gamma,
