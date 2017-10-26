@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-25 22:33:53
+# @Last Modified time: 2017-10-26 02:26:01
 
 import numpy as np
 import time
@@ -77,7 +77,7 @@ def main(args):
         for i_c,c_dist in enumerate(cs):
             assert (c_dist>0.5) & (c_dist<=1.0), "c_dist must be in (0.5,1]"
 
-            nus[i_rep,i_c] = float(gamma) + 1.5*(1-c_dist)
+            nus[i_rep,i_c] = float(gamma) + 2*(1-c_dist)
             rhos[i_rep,i_c] = c_dist
 
             # Calculate proper eta and beta based on parameters including delta
@@ -197,7 +197,7 @@ def parse_args():
                         default = 2, type = int)
     parser.add_argument('-std', dest='std',
                         help='standard deviation of Gaussian distribution (default:1.5)',
-                        default = 2.25, type = float)
+                        default = 2.0, type = float)
     parser.add_argument('-qs', dest='qs',
                         help='Probabilities q (not-sure with 1-q) ex) 0.7,0.85,1',
                         default = '0.7,0.85,1', type = str)
@@ -212,7 +212,7 @@ def parse_args():
                         default = 1.0, type = float)
     parser.add_argument('-g_max', dest='max_gamma',
                         help='minimum gamma margin (default:1)',
-                        default = 1.05, type = float)
+                        default = 1.1, type = float)
     parser.add_argument('-cs', dest='cs',
                         help='Fractions to set distance-weak parameters (0.5,1] ex) 0.7,0.85,1',
                         default = '0.6,0.8,1', type = str)
