@@ -10,6 +10,8 @@ We provide a novel and efficient semi-supervised active clustering algorithms fo
 
 Here, we provide an implementation of our weak SSAC algorithm with an option of using **Random or Local/Global Distance-Weak Oracle Models**, i.e. answers “*not-sure*” randomly with some fixed probability or based on distance between given points. Synthetic data is generated using Guassian distribution with several options. The algorithm is guaranteed to recover a ground truth clustering of the data with high probability. Please read our [paper](https://arxiv.org/abs/1709.03202) for details. We implemented the unified version of weak SSAC algorithm which can handle both random-weak and distance-weak oracles.
 
+Shorter version of the paper, [Relaxed Oracles for Semi-Supervised Clustering](https://arxiv.org/abs/1711.07433), was presented at [NIPS 2017 Workshop: Learning with Limited Labeled Data: Weak Supervision and Beyond (LLD 2017)](https://lld-workshop.github.io/papers/LLD_2017_paper_19.pdf).
+
 ## How to run our code
 You will run the main.py file with several options.
 ```
