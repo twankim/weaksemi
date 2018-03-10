@@ -2,7 +2,7 @@
 # @Author: twankim
 # @Date:   2017-02-24 17:46:51
 # @Last Modified by:   twankim
-# @Last Modified time: 2017-10-25 22:34:37
+# @Last Modified time: 2018-03-09 22:13:58
 
 import numpy as np
 import time
@@ -110,7 +110,7 @@ def main(args):
                res_dir+'/res_{}_{}_n{}_m{}_k{}.csv'.format(weak,"meanacc",n,m,k),weak=weak,params=qs)
     # print_eval("# Error(%)",res_err,qs,etas,
     #            res_dir+'/res_{}_n{}_m{}_k{}.csv'.format("err",n,m,k))
-    print_eval("# Failure",res_fail,etas,
+    print_eval("# Failures",res_fail,etas,
                res_dir+'/res_{}_{}_n{}_m{}_k{}.csv'.format(weak,"fail",n,m,k),
                is_sum=True,weak=weak,params=qs)
 
@@ -124,7 +124,7 @@ def main(args):
 
     # Plot Failure vs. eta
     fig_name = res_dir+'/fig_{}_{}_n{}_m{}_k{}.pdf'.format(weak,"fail",n,m,k)
-    plot_eval("# Failure",res_fail,etas,fig_name,is_sum=True,weak=weak,params=qs)
+    plot_eval("# Failures",res_fail,etas,fig_name,is_sum=True,weak=weak,params=qs)
 
     # Plot histogram of gammas
     fig_name = res_dir+'/fig_gamma_hist.pdf'
